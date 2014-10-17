@@ -16,6 +16,7 @@ import java.util.Properties;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -298,6 +299,7 @@ public class UIMain extends javax.swing.JFrame {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		setIconImage(new ImageIcon(this.getClass().getResource("or.png")).getImage());
 	}// </editor-fold>
 
 	// GEN-END:initComponents

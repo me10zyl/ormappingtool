@@ -117,10 +117,11 @@ public class BuildTool extends DBMain {
 			System.out.println("\t\treturn " + columnName + ";");
 			sb.append("\t\treturn " + columnName + ";" + "\r\n");
 			System.out.println("\t}");
-			sb.append("\t}");
-			if (i != columnCount)
+			sb.append("\t}\r\n");
+			if (i != columnCount) {
 				System.out.println();
-			sb.append("\r\n");
+				sb.append("\r\n");
+			}
 		}
 		System.out.println("}");
 		sb.append("}");
