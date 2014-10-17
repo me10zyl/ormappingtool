@@ -32,6 +32,16 @@ public class BuildTool extends DBMain {
 		}
 	}
 
+	public ArrayList<String> getTables() throws SQLException {
+		ArrayList<String> arr = new ArrayList<String>();
+		con = DriverManager.getConnection("jdbc:sqlserver://" + host + ":" + port + ";databaseName=" + dataBaseName, username, password);
+		ResultSet rs = con.getMetaData().getTables(null, null, null, new String[] { "TABLE" });
+		while (rs.next()) {
+			arr.add(rs.getString(3));
+		}
+		return arr;
+	}
+
 	public String build(String tableName) throws ClassNotFoundException, SQLException {
 		StringBuilder sb = new StringBuilder();
 		pst = getPreparedStatement("select * from " + tableName);
