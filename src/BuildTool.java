@@ -32,7 +32,8 @@ public class BuildTool extends DBMain {
 		}
 	}
 
-	public void build(String tableName) throws ClassNotFoundException, SQLException {
+	public String build(String tableName) throws ClassNotFoundException, SQLException {
+		StringBuilder sb = new StringBuilder();
 		pst = getPreparedStatement("select * from " + tableName);
 		rst = pst.executeQuery();
 		ResultSetMetaData data = rst.getMetaData();
@@ -41,27 +42,38 @@ public class BuildTool extends DBMain {
 		ArrayList<Field> arr = new ArrayList<BuildTool.Field>();
 
 		System.out.println("public class " + className + "{");
+		sb.append("public class " + className + "{" + "\r\n");
 		for (int i = 1; i <= columnCount; i++) {// 打印成员变量
 			String columnClassName = data.getColumnClassName(i);
 			String reallyColumnClassName = makeClassNameBeautiful(columnClassName);
 			String columnName = data.getColumnName(i);
 			arr.add(new Field(reallyColumnClassName, columnName));
 			System.out.print("\tprivate " + reallyColumnClassName + " ");
+			sb.append("\tprivate " + reallyColumnClassName + " ");
 			System.out.println(columnName + ";");
+			sb.append(columnName + ";" + "\r\n");
 		}
 		System.out.println();
+		sb.append("\r\n");
 
 		System.out.print("\tpublic " + className + "(");
+		sb.append("\tpublic " + className + "(");
 		for (int i = 0; i < arr.size() - 1; i++) {// 打印构造方法
 			System.out.print(arr.get(i).type + " " + arr.get(i).name + ",");
+			sb.append(arr.get(i).type + " " + arr.get(i).name + ",");
 		}
 		System.out.println(arr.get(arr.size() - 1).type + " " + arr.get(arr.size() - 1).name + ")");
+		sb.append(arr.get(arr.size() - 1).type + " " + arr.get(arr.size() - 1).name + ")" + "\r\n");
 		System.out.println("\t{");
+		sb.append("\t{" + "\r\n");
 		for (int i = 0; i < arr.size(); i++) {
 			System.out.println("\t\tthis." + arr.get(i).name + " = " + arr.get(i).name + ";");
+			sb.append("\t\tthis." + arr.get(i).name + " = " + arr.get(i).name + ";" + "\r\n");
 		}
 		System.out.println("\t}");
+		sb.append("\t}" + "\r\n");
 		System.out.println();
+		sb.append("\r\n");
 
 		for (int i = 1; i <= columnCount; i++) {// 打印方法
 			String columnClassName = data.getColumnClassName(i);
@@ -70,10 +82,15 @@ public class BuildTool extends DBMain {
 			String get = "get";
 			// set
 			System.out.println("\tpublic void " + "set" + makeStrFirstUpper(columnName) + "(" + reallyColumnClassName + " " + columnName + ")");
+			sb.append("\tpublic void " + "set" + makeStrFirstUpper(columnName) + "(" + reallyColumnClassName + " " + columnName + ")" + "\r\n");
 			System.out.println("\t{");
+			sb.append("\t{" + "\r\n");
 			System.out.println("\t\tthis." + columnName + " = " + columnName + ";");
+			sb.append("\t\tthis." + columnName + " = " + columnName + ";" + "\r\n");
 			System.out.println("\t}");
+			sb.append("\t}" + "\r\n");
 			System.out.println();
+			sb.append("\r\n");
 			// is
 			String makeStrFirstUpper = makeStrFirstUpper(columnName);
 			if (reallyColumnClassName.equals("Boolean")) {
@@ -84,14 +101,21 @@ public class BuildTool extends DBMain {
 			}
 			// get
 			System.out.println("\tpublic " + reallyColumnClassName + " " + get + makeStrFirstUpper + "()");
+			sb.append("\tpublic " + reallyColumnClassName + " " + get + makeStrFirstUpper + "()" + "\r\n");
 			System.out.println("\t{");
+			sb.append("\t{" + "\r\n");
 			System.out.println("\t\treturn " + columnName + ";");
+			sb.append("\t\treturn " + columnName + ";" + "\r\n");
 			System.out.println("\t}");
+			sb.append("\t}");
 			if (i != columnCount)
 				System.out.println();
+			sb.append("\r\n");
 		}
 		System.out.println("}");
+		sb.append("}");
 		realese();
+		return sb.toString();
 	}
 
 	private String removeIs(String str) {

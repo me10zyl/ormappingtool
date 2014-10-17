@@ -1,7 +1,7 @@
 import java.sql.SQLException;
 
 
-public class Main {
+public class ConsoleMain {
 	public static void main(String[] args) {
 		BuildTool tool = new BuildTool("100.1.0.46","1433","bookshop_case","sa","sa");
 		try {
