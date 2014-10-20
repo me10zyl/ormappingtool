@@ -325,7 +325,7 @@ public class UIMain extends javax.swing.JFrame {
 		// TODO add your handling code here:
 		BuildTool tool = new BuildTool(jf_address.getText(), jf_port.getText(), jf_dbname.getText(), jf_username.getText(), jf_password.getText());
 		try {
-			String string = tool.build(jf_tablename.getText());
+			String string = tool.buildClass(jf_tablename.getText());
 			jTextArea1.setText(string);
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -335,6 +335,9 @@ public class UIMain extends javax.swing.JFrame {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			JOptionPane.showMessageDialog(null, e.getMessage());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 

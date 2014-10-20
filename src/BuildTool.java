@@ -1,3 +1,8 @@
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -42,65 +47,63 @@ public class BuildTool extends DBMain {
 		return arr;
 	}
 
-	public String build(String tableName) throws ClassNotFoundException, SQLException {
-		StringBuilder sb = new StringBuilder();
+	public String buildClass(String tableName) throws ClassNotFoundException, SQLException, IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(baos));
+
 		pst = getPreparedStatement("select * from " + tableName);
 		rst = pst.executeQuery();
 		ResultSetMetaData data = rst.getMetaData();
 		int columnCount = data.getColumnCount();
 		String className = makeStrFirstUpper(tableName);
-		ArrayList<Field> arr = new ArrayList<BuildTool.Field>();
+		ArrayList<Field> arr_field = new ArrayList<BuildTool.Field>();
 
-		System.out.println("public class " + className + "{");
-		sb.append("public class " + className + "{" + "\r\n");
+		bw.write("public class " + className);
+		bw.newLine();
+		bw.write("{");
+		bw.newLine();
 		for (int i = 1; i <= columnCount; i++) {// 打印成员变量
 			String columnClassName = data.getColumnClassName(i);
 			String reallyColumnClassName = makeClassNameBeautiful(columnClassName);
 			String columnName = data.getColumnName(i);
-			arr.add(new Field(reallyColumnClassName, columnName));
-			System.out.print("\tprivate " + reallyColumnClassName + " ");
-			sb.append("\tprivate " + reallyColumnClassName + " ");
-			System.out.println(columnName + ";");
-			sb.append(columnName + ";" + "\r\n");
+			arr_field.add(new Field(reallyColumnClassName, columnName));
+			bw.write("\tprivate " + reallyColumnClassName + " ");
+			bw.write(columnName + ";");
+			bw.newLine();
 		}
-		System.out.println();
-		sb.append("\r\n");
-
-		System.out.print("\tpublic " + className + "(");
-		sb.append("\tpublic " + className + "(");
-		for (int i = 0; i < arr.size() - 1; i++) {// 打印构造方法
-			System.out.print(arr.get(i).type + " " + arr.get(i).name + ",");
-			sb.append(arr.get(i).type + " " + arr.get(i).name + ",");
+		bw.newLine();
+		
+		bw.write("\tpublic " + className + "(");
+		for (int i = 0; i < arr_field.size() - 1; i++) {// 打印构造方法
+			bw.write(arr_field.get(i).type + " " + arr_field.get(i).name + ",");
 		}
-		System.out.println(arr.get(arr.size() - 1).type + " " + arr.get(arr.size() - 1).name + ")");
-		sb.append(arr.get(arr.size() - 1).type + " " + arr.get(arr.size() - 1).name + ")" + "\r\n");
-		System.out.println("\t{");
-		sb.append("\t{" + "\r\n");
-		for (int i = 0; i < arr.size(); i++) {
-			System.out.println("\t\tthis." + arr.get(i).name + " = " + arr.get(i).name + ";");
-			sb.append("\t\tthis." + arr.get(i).name + " = " + arr.get(i).name + ";" + "\r\n");
+		bw.write(arr_field.get(arr_field.size() - 1).type + " " + arr_field.get(arr_field.size() - 1).name + ")");
+		bw.newLine();
+		bw.write("\t{");
+		bw.newLine();
+		for (int i = 0; i < arr_field.size(); i++) {
+			bw.write("\t\tthis." + arr_field.get(i).name + " = " + arr_field.get(i).name + ";");
+			bw.newLine();
 		}
-		System.out.println("\t}");
-		sb.append("\t}" + "\r\n");
-		System.out.println();
-		sb.append("\r\n");
-
+		bw.write("\t}");
+		bw.newLine();
+		bw.newLine();
+		
 		for (int i = 1; i <= columnCount; i++) {// 打印方法
 			String columnClassName = data.getColumnClassName(i);
 			String columnName = data.getColumnName(i);
 			String reallyColumnClassName = makeClassNameBeautiful(columnClassName);
 			String get = "get";
 			// set
-			System.out.println("\tpublic void " + "set" + makeStrFirstUpper(columnName) + "(" + reallyColumnClassName + " " + columnName + ")");
-			sb.append("\tpublic void " + "set" + makeStrFirstUpper(columnName) + "(" + reallyColumnClassName + " " + columnName + ")" + "\r\n");
-			System.out.println("\t{");
-			sb.append("\t{" + "\r\n");
-			System.out.println("\t\tthis." + columnName + " = " + columnName + ";");
-			sb.append("\t\tthis." + columnName + " = " + columnName + ";" + "\r\n");
-			System.out.println("\t}");
-			sb.append("\t}" + "\r\n");
-			System.out.println();
-			sb.append("\r\n");
+			bw.write("\tpublic void " + "set" + makeStrFirstUpper(columnName) + "(" + reallyColumnClassName + " " + columnName + ")");
+			bw.newLine();
+			bw.write("\t{");
+			bw.newLine();
+			bw.write("\t\treturn " + columnName + ";");
+			bw.newLine();
+			bw.write("\t}");
+			bw.newLine();
+			bw.newLine();
 			// is
 			String makeStrFirstUpper = makeStrFirstUpper(columnName);
 			if (reallyColumnClassName.equals("Boolean")) {
@@ -110,23 +113,38 @@ public class BuildTool extends DBMain {
 				}
 			}
 			// get
-			System.out.println("\tpublic " + reallyColumnClassName + " " + get + makeStrFirstUpper + "()");
-			sb.append("\tpublic " + reallyColumnClassName + " " + get + makeStrFirstUpper + "()" + "\r\n");
-			System.out.println("\t{");
-			sb.append("\t{" + "\r\n");
-			System.out.println("\t\treturn " + columnName + ";");
-			sb.append("\t\treturn " + columnName + ";" + "\r\n");
-			System.out.println("\t}");
-			sb.append("\t}\r\n");
-			if (i != columnCount) {
-				System.out.println();
-				sb.append("\r\n");
-			}
+			bw.write("\tpublic " + reallyColumnClassName + " " + get + makeStrFirstUpper + "()");
+			bw.newLine();
+			bw.write("\t{");
+			bw.newLine();
+			bw.write("\t\treturn " + columnName + ";");
+			bw.newLine();
+			bw.write("\t}");
+			bw.newLine();
+			bw.newLine();
 		}
-		System.out.println("}");
-		sb.append("}");
+
+		String methodName = "\tpublic String toString()";// toString
+		bw.write(methodName);
+		bw.newLine();
+		bw.write("\t" + "{");
+		bw.newLine();
+		bw.write("\t\treturn ");
+		for (int i = 0; i < arr_field.size() - 1; i++) {
+			bw.write(arr_field.get(i).name + "+\"\\t\"+");
+		}
+		bw.write(arr_field.get(arr_field.size() - 1).name + ";");
+		bw.newLine();
+		bw.write("\t}");
+		bw.newLine();
+
+		bw.write("}");
+		bw.newLine();
 		realese();
-		return sb.toString();
+		bw.close();
+		baos.close();
+		baos.writeTo(System.out);
+		return baos.toString();
 	}
 
 	private String removeIs(String str) {
