@@ -91,6 +91,18 @@ public class BuildTool extends DBMain {
 		}
 		return arr;
 	}
+	
+	public ArrayList<String> getDatabases() throws SQLException, ClassNotFoundException
+	{
+		ArrayList<String> arr = new ArrayList<String>();
+		pst = getPreparedStatement("SELECT Name FROM Master..SysDatabases ORDER BY Name");
+		rst = pst.executeQuery();
+		while(rst.next())
+		{
+			arr.add(rst.getString(1));
+		}
+		return arr;
+	}
 
 	private ArrayList<Field> getField(String tableName) throws SQLException, ClassNotFoundException {
 		ArrayList<Field> arr = new ArrayList<BuildTool.Field>();
@@ -123,7 +135,6 @@ public class BuildTool extends DBMain {
 			arr_methodfield.add(new Field(field_type, field_name));
 			method_name = "set" + makeStrFirstUpper(field_name);
 			arr_method.add(new Method(return_type, method_name, arr_methodfield));
-
 			// is
 			String makeStrFirstUpper = makeStrFirstUpper(field_name);
 			if (field_type.equals("Boolean")) {
