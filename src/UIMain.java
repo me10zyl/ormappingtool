@@ -1,8 +1,7 @@
-import java.awt.Component;
-import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
@@ -10,7 +9,9 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -19,20 +20,19 @@ import java.util.ArrayList;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JMenu;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextPane;
 import javax.swing.LayoutStyle;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ListDataListener;
 
@@ -52,6 +52,10 @@ public class UIMain extends javax.swing.JFrame
 	private JScrollPane jScrollPane3;
 	private JTextArea jTextArea3;
 	private ArrayList<String> arr_model2;
+	private JScrollPane jScrollPane4;
+	private JTextArea jTextArea4;
+	private JButton jb_about;
+	private JButton jb_file;
 
 	/** Creates new form UIMain */
 	public UIMain()
@@ -83,6 +87,16 @@ public class UIMain extends javax.swing.JFrame
 					jTextArea1.setRows(5);
 				}
 			}
+		}
+		{
+			jb_about = new JButton();
+			jb_about.setText("\u5173\u4e8e");
+			jb_about.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					//TODO add your code for jb_about.actionPerformed
+					JOptionPane.showMessageDialog(UIMain.this, "目前仅支持SQL Server\n如有Bug，请@zyl");
+				}
+			});
 		}
 		jPanel1 = new javax.swing.JPanel();
 		jLabel1 = new javax.swing.JLabel();
@@ -116,6 +130,10 @@ public class UIMain extends javax.swing.JFrame
 		jf_password.setText("sa");
 		javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
 		jPanel1.setLayout(jPanel1Layout);
+		{
+			jb_file = new JButton();
+			jb_file.setText("\u8f93\u51fa\u81f3\u6587\u4ef6");
+		}
 		jPanel1Layout.setHorizontalGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(jPanel1Layout.createSequentialGroup().addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(jPanel1Layout.createSequentialGroup().addComponent(jLabel1).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(jf_username, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)).addGroup(jPanel1Layout.createSequentialGroup().addComponent(jLabel2).addGap(18, 18, 18).addComponent(jf_password, javax.swing.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE))).addContainerGap()));
 		jPanel1Layout.setVerticalGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(jPanel1Layout.createSequentialGroup().addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jLabel1).addComponent(jf_username, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED).addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jLabel2).addComponent(jf_password, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)).addContainerGap(8, Short.MAX_VALUE)));
 		jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "\u6570\u636e\u5e93\u5730\u5740"));
@@ -194,18 +212,65 @@ public class UIMain extends javax.swing.JFrame
 		});
 		javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
 		jPanel4.setLayout(jPanel4Layout);
-		layout.setVerticalGroup(layout.createSequentialGroup().addComponent(jPanel4, GroupLayout.PREFERRED_SIZE, 177, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addComponent(jTabbedPane1, GroupLayout.PREFERRED_SIZE, 375, GroupLayout.PREFERRED_SIZE).addContainerGap(32, Short.MAX_VALUE));
-		layout.setHorizontalGroup(layout.createParallelGroup().addGroup(GroupLayout.Alignment.LEADING, layout.createSequentialGroup().addComponent(jPanel4, GroupLayout.PREFERRED_SIZE, 563, GroupLayout.PREFERRED_SIZE).addContainerGap(11, Short.MAX_VALUE)).addGroup(GroupLayout.Alignment.LEADING, layout.createSequentialGroup().addGap(19).addComponent(jTabbedPane1, GroupLayout.PREFERRED_SIZE, 544, GroupLayout.PREFERRED_SIZE).addContainerGap(11, Short.MAX_VALUE)));
-		jPanel4Layout.setVerticalGroup(jPanel4Layout
-				.createSequentialGroup()
-				.addGroup(jPanel4Layout.createParallelGroup().addGroup(GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup().addComponent(jPanel3, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE).addGap(6)).addComponent(jPanel1, GroupLayout.Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE))
-				.addGroup(jPanel4Layout.createParallelGroup().addGroup(GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup().addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE).addGap(0, 13, Short.MAX_VALUE))
-						.addGroup(GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup().addComponent(jButton1, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addGroup(jPanel4Layout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(jb_copy, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(jb_get, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)))).addContainerGap());
-		jPanel4Layout.setHorizontalGroup(jPanel4Layout
-				.createSequentialGroup()
-				.addContainerGap()
-				.addGroup(jPanel4Layout.createParallelGroup().addGroup(GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup().addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, 258, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED).addGroup(jPanel4Layout.createParallelGroup().addGroup(GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup().addComponent(jb_copy, GroupLayout.PREFERRED_SIZE, 91, GroupLayout.PREFERRED_SIZE).addGap(0, 98, Short.MAX_VALUE).addComponent(jb_get, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE).addGap(6)).addComponent(jButton1, GroupLayout.Alignment.LEADING, 0, 281, Short.MAX_VALUE)).addGap(6))
-						.addGroup(GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup().addComponent(jPanel3, GroupLayout.PREFERRED_SIZE, 367, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addComponent(jPanel1, 0, 184, Short.MAX_VALUE))));
+		layout.setVerticalGroup(layout.createSequentialGroup()
+			.addComponent(jPanel4, GroupLayout.PREFERRED_SIZE, 177, GroupLayout.PREFERRED_SIZE)
+			.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+			.addComponent(jTabbedPane1, GroupLayout.PREFERRED_SIZE, 375, GroupLayout.PREFERRED_SIZE)
+			.addComponent(jb_about, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE));
+		layout.setHorizontalGroup(layout.createParallelGroup()
+			.addGroup(GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+			    .addComponent(jPanel4, GroupLayout.PREFERRED_SIZE, 563, GroupLayout.PREFERRED_SIZE)
+			    .addContainerGap(11, Short.MAX_VALUE))
+			.addGroup(layout.createSequentialGroup()
+			    .addGap(19)
+			    .addGroup(layout.createParallelGroup()
+			        .addGroup(GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+			            .addComponent(jTabbedPane1, GroupLayout.PREFERRED_SIZE, 544, GroupLayout.PREFERRED_SIZE)
+			            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 0, Short.MAX_VALUE))
+			        .addGroup(GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+			            .addGap(0, 480, Short.MAX_VALUE)
+			            .addComponent(jb_about, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)))
+			    .addContainerGap()));
+		jPanel4Layout.setVerticalGroup(jPanel4Layout.createSequentialGroup()
+			.addGroup(jPanel4Layout.createParallelGroup()
+			    .addGroup(GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
+			        .addComponent(jPanel3, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
+			        .addGap(6))
+			    .addComponent(jPanel1, GroupLayout.Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE))
+			.addGroup(jPanel4Layout.createParallelGroup()
+			    .addGroup(GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
+			        .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
+			        .addGap(0, 13, Short.MAX_VALUE))
+			    .addGroup(GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
+			        .addComponent(jButton1, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE)
+			        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+			        .addGroup(jPanel4Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+			            .addComponent(jb_copy, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+			            .addComponent(jb_get, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+			            .addComponent(jb_file, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))))
+			.addContainerGap());
+		jPanel4Layout.setHorizontalGroup(jPanel4Layout.createSequentialGroup()
+			.addContainerGap()
+			.addGroup(jPanel4Layout.createParallelGroup()
+			    .addGroup(GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
+			        .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, 258, GroupLayout.PREFERRED_SIZE)
+			        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+			        .addGroup(jPanel4Layout.createParallelGroup()
+			            .addGroup(GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
+			                .addComponent(jb_copy, GroupLayout.PREFERRED_SIZE, 91, GroupLayout.PREFERRED_SIZE)
+			                .addGap(0, 196, Short.MAX_VALUE))
+			            .addComponent(jButton1, GroupLayout.Alignment.LEADING, 0, 287, Short.MAX_VALUE)))
+			    .addGroup(GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
+			        .addComponent(jPanel3, GroupLayout.PREFERRED_SIZE, 367, GroupLayout.PREFERRED_SIZE)
+			        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+			        .addGroup(jPanel4Layout.createParallelGroup()
+			            .addGroup(GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
+			                .addGap(0, 0, Short.MAX_VALUE)
+			                .addComponent(jb_get, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE)
+			                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+			                .addComponent(jb_file, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE)
+			                .addGap(6))
+			            .addComponent(jPanel1, GroupLayout.Alignment.LEADING, 0, 184, Short.MAX_VALUE)))));
 		pack();
 		this.setSize(580, 618);
 		String lnfName = "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
@@ -361,13 +426,66 @@ public class UIMain extends javax.swing.JFrame
 				}
 			}
 		});
+		jb_file.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent evt)
+			{
+				// TODO add your code for
+				// jb_file.actionPerformed
+				int res = JOptionPane.showConfirmDialog(UIMain.this, "将输出DBMAIN、类、DAO、DAOTest的JAVA文件至本目录下的oROutputs目录", "输出至文件...", JOptionPane.YES_NO_OPTION);
+				// 是
+				if (res == 0)
+				{
+					final BuildTool tool = new BuildTool(jf_address.getText(), jf_port.getText(), jf_dbname.getText(), jf_username.getText(), jf_password.getText());
+					try
+					{
+						String dbmain = tool.buildDBMain();
+						String class_ = tool.buildClass(jf_tablename.getText());
+						String dao = tool.buildDAO(jf_tablename.getText());
+						String daoTest = tool.buildDAOTest(jf_tablename.getText());
+						String[] javas = {dbmain,class_,dao,daoTest};
+						String dirName = "oROutputs";
+						for(int i = 0; i < javas.length;i++)
+						{
+							File dir = new File(dirName);
+							if(!dir.exists())
+							{
+								dir.mkdir();
+							}
+							FileOutputStream fos = new FileOutputStream(dirName+"/"+getClassName(javas[i])+".java");
+							fos.write(javas[i].getBytes());
+							fos.close();
+						}
+						JOptionPane.showMessageDialog(UIMain.this, "成功!");
+					} catch (ClassNotFoundException e)
+					{
+						// TODO Auto-generated catch
+						// block
+						e.printStackTrace();
+						JOptionPane.showMessageDialog(null, e.getMessage());
+					} catch (SQLException e)
+					{
+						// TODO Auto-generated catch
+						// block
+						e.printStackTrace();
+						JOptionPane.showMessageDialog(null, e.getMessage());
+					} catch (IOException e)
+					{
+						// TODO Auto-generated catch
+						// block
+						e.printStackTrace();
+						JOptionPane.showMessageDialog(null, e.getMessage());
+					}
+				}
+			}
+		});
 	}// </editor-fold>
-		// GEN-END:initComponents
+	// GEN-END:initComponents
 	private void jb_copyActionPerformed(java.awt.event.ActionEvent evt)
 	{
 		// TODO add your handling code here:
 		JTextArea[] areas =
-		{ jTextArea1, jTextArea2, jTextArea3 };
+		{ jTextArea1, jTextArea2, jTextArea3,jTextArea4 };
 		StringSelection stringSelection = new StringSelection(areas[jTabbedPane1.getSelectedIndex()].getText());
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
 	}
@@ -409,6 +527,7 @@ public class UIMain extends javax.swing.JFrame
 		{
 			String class_ = tool.buildClass(jf_tablename.getText());
 			String dao = tool.buildDAO(jf_tablename.getText());
+			String daoTest = tool.buildDAOTest(jf_tablename.getText());
 			if (jScrollPane2 == null)
 			{
 				jScrollPane2 = new JScrollPane();
@@ -425,18 +544,21 @@ public class UIMain extends javax.swing.JFrame
 					@Override
 					public void keyTyped(KeyEvent e)
 					{
-						// TODO Auto-generated method stub
+						// TODO Auto-generated method
+						// stub
 						e.consume();
 					}
 					@Override
 					public void keyReleased(KeyEvent e)
 					{
-						// TODO Auto-generated method stub
+						// TODO Auto-generated method
+						// stub
 					}
 					@Override
 					public void keyPressed(KeyEvent e)
 					{
-						// TODO Auto-generated method stub
+						// TODO Auto-generated method
+						// stub
 						e.consume();
 					}
 				});
@@ -457,26 +579,66 @@ public class UIMain extends javax.swing.JFrame
 					@Override
 					public void keyTyped(KeyEvent e)
 					{
-						// TODO Auto-generated method stub
+						// TODO Auto-generated method
+						// stub
 						e.consume();
 					}
 					@Override
 					public void keyReleased(KeyEvent e)
 					{
-						// TODO Auto-generated method stub
+						// TODO Auto-generated method
+						// stub
 					}
 					@Override
 					public void keyPressed(KeyEvent e)
 					{
-						// TODO Auto-generated method stub
+						// TODO Auto-generated method
+						// stub
+						e.consume();
+					}
+				});
+			}
+			if (jScrollPane4 == null)
+			{
+				jScrollPane4 = new JScrollPane();
+				jTabbedPane1.addTab(getClassName(daoTest), null, jScrollPane4, null);
+				jScrollPane4.setPreferredSize(new java.awt.Dimension(451, 341));
+				{
+					jTextArea4 = new javax.swing.JTextArea();
+					jScrollPane4.setViewportView(jTextArea4);
+					jTextArea4.setColumns(20);
+					jTextArea4.setRows(5);
+				}
+				jTextArea4.addKeyListener(new KeyListener()
+				{
+					@Override
+					public void keyTyped(KeyEvent e)
+					{
+						// TODO Auto-generated method
+						// stub
+						e.consume();
+					}
+					@Override
+					public void keyReleased(KeyEvent e)
+					{
+						// TODO Auto-generated method
+						// stub
+					}
+					@Override
+					public void keyPressed(KeyEvent e)
+					{
+						// TODO Auto-generated method
+						// stub
 						e.consume();
 					}
 				});
 			}
 			jTabbedPane1.setTitleAt(1, getClassName(class_));
 			jTabbedPane1.setTitleAt(2, getClassName(dao));
+			jTabbedPane1.setTitleAt(3, getClassName(daoTest));
 			jTextArea2.setText(class_);
 			jTextArea3.setText(dao);
+			jTextArea4.setText(daoTest);
 		} catch (ClassNotFoundException e)
 		{
 			// TODO Auto-generated catch block

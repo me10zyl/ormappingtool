@@ -1,0 +1,60 @@
+import java.sql.SQLException;
+import java.util.ArrayList;
+
+public class <class>DAOTest {
+	private static <class>DAO <lower_class>DAO = new <class>DAO();
+
+	/**
+	 * @author ZyL
+	 * @param args
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 */
+	public static void main(String[] args) throws ClassNotFoundException, SQLException {
+		try {
+			System.out.println("getAllTest:");
+			getAllTest();
+			System.out.println("getByIdTest:");
+			getbyIdTest(1);
+			System.out.println("addTest:");
+			// addTest();
+			System.out.println("deleteTest:");
+			// deleteTest(1);
+			System.out.println("modifyTest:");
+			<class> <lower_class> = new <class>(<constructor>);
+			modifyTest(<lower_class>);
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void getAllTest() throws ClassNotFoundException, SQLException {
+		ArrayList<<class>> <class> = <lower_class>DAO.getAll();
+		for (<class> <lower_class> : <class>) {
+			System.out.print(<lower_class> + "\t");
+			System.out.println();
+		}
+	}
+
+	private static void getbyIdTest(int id) throws ClassNotFoundException, SQLException {
+		<class> <class> = <lower_class>DAO.getById(id);
+		System.out.println(<class>);
+	}
+
+	private static void addTest() throws ClassNotFoundException, SQLException {
+		<class> <lower_class> = new <class>();
+		<set>
+		<lower_class>DAO.add(<lower_class>);
+	}
+
+	private static void deleteTest(int id) throws ClassNotFoundException, SQLException {
+		<lower_class>DAO.delete(id);
+	}
+
+	private static void modifyTest(<class> <lower_class>) throws ClassNotFoundException, SQLException {
+		<lower_class>DAO.modify(<lower_class>);
+	}
+
+}
