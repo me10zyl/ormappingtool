@@ -21,8 +21,8 @@ public class <class>DAOTest {
 			System.out.println("deleteTest:");
 			// deleteTest(1);
 			System.out.println("modifyTest:");
-			<class> <lower_class> = new <class>(<constructor>);
-			modifyTest(<lower_class>);
+			//<class> <lower_class> = new <class>(<constructor>);
+			//modifyTest(<lower_class>);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {

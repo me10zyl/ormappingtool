@@ -91,7 +91,6 @@ public class BuildTool extends DBMain
 			return "Class_ [className=" + className + ", arr_field=" + arr_field + ", arr_method=" + arr_method + "]";
 		}
 	}
-
 	public ArrayList<String> getTables() throws SQLException
 	{
 		ArrayList<String> arr = new ArrayList<String>();
@@ -191,6 +190,13 @@ public class BuildTool extends DBMain
 			} else if (m.methodName.startsWith("set"))
 				arr_method_set.add(m);
 		}
+		bw.write("import java.sql.ResultSet;");
+		bw.newLine();
+		bw.write("import java.sql.SQLException;");
+		bw.newLine();
+		bw.write("import java.util.ArrayList;");
+		bw.newLine();
+		bw.newLine();
 		bw.write("public class " + class_name + "DAO extends DBMain<" + class_name + ">");
 		bw.newLine();
 		bw.write("{");
@@ -255,23 +261,26 @@ public class BuildTool extends DBMain
 		bw.newLine();
 		bw.write("\t{");
 		bw.newLine();
-		String sql2 = "\t\tString sql = \"update from " + tableName + " set ";
+		String sql2 = "\t\tString sql = \"update " + tableName + " set ";
 		for (int i = 1; i < arr_field.size(); i++)
 		{
 			Field f = arr_field.get(i);
 			sql2 += f.name + "=?,";
 		}
 		sql2 = sql2.substring(0, sql2.length() - 1);
+		sql2 += " where "+arr_field.get(0).name +"=?";
 		sql2 += "\";";
 		bw.write(sql2);
+		bw.newLine();
+		bw.write("pst = this.getPreparedStatement(sql);");
 		bw.newLine();
 		for (int i = 1; i < arr_method_get.size(); i++)
 		{
 			Method method = arr_method_get.get(i);
-			bw.write("\t\tpst.set" + makeStrFirstUpper(method.returnType) + "(" + (i) + ", " + tableName + "." + method.methodName + "());");
+			bw.write("\t\tpst.set" + makeStrFirstUpper(method.returnType) + "(" + (i) + ", " + newUser + "." + method.methodName + "());");
 			bw.newLine();
 		}
-		bw.write("\t\tpst.set" + makeStrFirstUpper(arr_method_get.get(0).returnType) + "(" + (arr_method_get.size()) + ", " + tableName + "." + arr_method_get.get(0).methodName + "());");
+		bw.write("\t\tpst.set" + makeStrFirstUpper(arr_method_get.get(0).returnType) + "(" + (arr_method_get.size()) + ", " + newUser + "." + arr_method_get.get(0).methodName + "());");
 		bw.newLine();
 		bw.write("\t\tpst.executeUpdate();");
 		bw.newLine();
@@ -290,7 +299,7 @@ public class BuildTool extends DBMain
 		bw.newLine();
 		bw.write("\t{");
 		bw.newLine();
-		bw.write("\t\tString sql = \"select * from " + arr_name + "\";");
+		bw.write("\t\tString sql = \"select * from " + tableName + "\";");
 		bw.newLine();
 		bw.write("\t\tpst = this.getPreparedStatement(sql);");
 		bw.newLine();
@@ -318,7 +327,7 @@ public class BuildTool extends DBMain
 		bw.newLine();
 		bw.write("\t{");
 		bw.newLine();
-		bw.write("\t\tString sql = \"select * from " + arr_name + " where " + arr_field.get(0).name + "=?\";");
+		bw.write("\t\tString sql = \"select * from " + tableName + " where " + arr_field.get(0).name + "=?\";");
 		bw.newLine();
 		bw.write("\t\tpst = this.getPreparedStatement(sql);");
 		bw.newLine();
@@ -332,11 +341,13 @@ public class BuildTool extends DBMain
 		bw.newLine();
 		bw.write("\t\t{");
 		bw.newLine();
-		bw.write("\t\t\t" + arr_name + ".add(assemble(rst));");
+		bw.write("\t\t\t" + tableName + "= assemble(rst);");
 		bw.newLine();
 		bw.write("\t\t}");
 		bw.newLine();
-		bw.write("\t\trelease();");
+		bw.write("\t\trealese();");
+		bw.newLine();
+		bw.write("\t\treturn "+tableName+";");
 		bw.newLine();
 		bw.write("\t}");
 		bw.newLine();
