@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -91,6 +92,7 @@ public class BuildTool extends DBMain
 			return "Class_ [className=" + className + ", arr_field=" + arr_field + ", arr_method=" + arr_method + "]";
 		}
 	}
+
 	public ArrayList<String> getTables() throws SQLException
 	{
 		ArrayList<String> arr = new ArrayList<String>();
@@ -106,13 +108,86 @@ public class BuildTool extends DBMain
 	public ArrayList<String> getDatabases() throws SQLException, ClassNotFoundException
 	{
 		ArrayList<String> arr = new ArrayList<String>();
-		pst = getPreparedStatement("SELECT Name FROM Master..SysDatabases ORDER BY Name");
-		rst = pst.executeQuery();
+		// pst =
+		// getPreparedStatement("SELECT Name FROM Master..SysDatabases ORDER BY Name");
+		// rst = pst.executeQuery();
+		con = DriverManager.getConnection("jdbc:sqlserver://" + host + ":" + port + ";databaseName=" + dataBaseName, username, password);
+		DatabaseMetaData metaData = con.getMetaData();
+		rst = metaData.getCatalogs();
 		while (rst.next())
 		{
 			arr.add(rst.getString(1));
 		}
 		return arr;
+	}
+	private ArrayList<String> getImportKeysTableNames(String tableName) throws SQLException
+	{
+		ArrayList<String> arr = new ArrayList<String>();
+		con = DriverManager.getConnection("jdbc:sqlserver://" + host + ":" + port + ";databaseName=" + dataBaseName, username, password);
+		DatabaseMetaData metaData = con.getMetaData();
+		ResultSet importKeys = metaData.getImportedKeys(con.getCatalog(), null, tableName);//获取结果集后将自动关闭连接
+		while (importKeys.next())
+		{
+			String fkColumnName = importKeys.getString("FKCOLUMN_NAME");
+			String pkTablenName = importKeys.getString("PKTABLE_NAME");
+			String pkColumnName = importKeys.getString("PKCOLUMN_NAME");
+			arr.add(pkTablenName);
+		}
+		realese(); 
+		return arr;
+	}
+	private ArrayList<String> getImportKeysFKColumnNames(String tableName) throws SQLException
+	{
+		ArrayList<String> arr = new ArrayList<String>();
+		con = DriverManager.getConnection("jdbc:sqlserver://" + host + ":" + port + ";databaseName=" + dataBaseName, username, password);
+		DatabaseMetaData metaData = con.getMetaData();
+		ResultSet importKeys = metaData.getImportedKeys(con.getCatalog(), null, tableName);//获取结果集后将自动关闭连接
+		while (importKeys.next())
+		{
+			String fkColumnName = importKeys.getString("FKCOLUMN_NAME");
+			String pkTablenName = importKeys.getString("PKTABLE_NAME");
+			String pkColumnName = importKeys.getString("PKCOLUMN_NAME");
+			arr.add(fkColumnName);
+		}
+		realese(); 
+		return arr;
+	}
+	private ArrayList<String> getExportKeysTableNames(String tableName) throws SQLException
+	{
+		ArrayList<String> arr = new ArrayList<String>();
+		con = DriverManager.getConnection("jdbc:sqlserver://" + host + ":" + port + ";databaseName=" + dataBaseName, username, password);
+		DatabaseMetaData metaData = con.getMetaData();
+		ResultSet exportedKeys = metaData.getExportedKeys(con.getCatalog(), null, tableName);
+		while (exportedKeys.next())
+		{
+			String fkTableName = exportedKeys.getString("FKTABLE_NAME");
+			String fkColumnName = exportedKeys.getString("FKCOLUMN_NAME");
+			String pkTablenName = exportedKeys.getString("PKTABLE_NAME");
+			String pkColumnName = exportedKeys.getString("PKCOLUMN_NAME");
+			arr.add(fkTableName);
+		}
+		realese();
+		return arr;
+	}
+	private ArrayList<Field> getImportKeysFields(String tableName) throws SQLException
+	{
+		ArrayList<Field> arr_field = new ArrayList<BuildTool.Field>();
+		ArrayList<String> arr = getImportKeysTableNames(tableName);
+		for(String str : arr)
+		{
+			arr_field.add(new Field(getClassName(str), getVariableName(str)));
+		}
+		return arr_field;
+	}
+	private ArrayList<Field> getExportKeysFields(String tableName) throws SQLException
+	{
+		ArrayList<Field> arr_field = new ArrayList<BuildTool.Field>();
+		ArrayList<String> arr = getExportKeysTableNames(tableName);
+		for(String str : arr)
+		{
+			arr_field.add(new Field(getClassName(str), getVariableName(str)));
+		}
+		return arr_field;
 	}
 	private ArrayList<Field> getField(String tableName) throws SQLException, ClassNotFoundException
 	{
@@ -268,7 +343,7 @@ public class BuildTool extends DBMain
 			sql2 += f.name + "=?,";
 		}
 		sql2 = sql2.substring(0, sql2.length() - 1);
-		sql2 += " where "+arr_field.get(0).name +"=?";
+		sql2 += " where " + arr_field.get(0).name + "=?";
 		sql2 += "\";";
 		bw.write(sql2);
 		bw.newLine();
@@ -347,7 +422,7 @@ public class BuildTool extends DBMain
 		bw.newLine();
 		bw.write("\t\trealese();");
 		bw.newLine();
-		bw.write("\t\treturn "+tableName+";");
+		bw.write("\t\treturn " + tableName + ";");
 		bw.newLine();
 		bw.write("\t}");
 		bw.newLine();
@@ -375,6 +450,17 @@ public class BuildTool extends DBMain
 		baos.close();
 		baos.writeTo(System.out);
 		return baos.toString();
+	}
+	private void printGetDetailById(ByteArrayOutputStream baos,ArrayList<Field> arr_field)
+	{
+		String sql = "select * from <table1>,<table2> where <table1>.<importKey_columnName> = <table2>.<importKey_columnName> and <table1>.<table1_id> = ?";
+		printImportKeysTable(baos,arr_field);
+	}
+	private void printImportKeysTable(ByteArrayOutputStream baos,ArrayList<Field> arr_field)
+	{
+		Field field1 = arr_field.get(0);
+		// TODO Auto-generated method stub
+		
 	}
 	public String buildDBMain() throws IOException
 	{
@@ -412,7 +498,6 @@ public class BuildTool extends DBMain
 		String replaceStr = baos.toString();
 		replaceStr = replaceStr.replace("<class>", getClassName(tableName));
 		replaceStr = replaceStr.replace("<lower_class>", getVariableName(tableName));
-		
 		String constructor = "";
 		for (int i = 0; i < arr_field.size(); i++)
 		{
@@ -426,16 +511,15 @@ public class BuildTool extends DBMain
 			{
 				constructor += "\"" + arr_field.get(i).name + "\"";
 			}
-			if(i != (arr_field.size() - 1))
+			if (i != (arr_field.size() - 1))
 			{
 				constructor += ",";
 			}
 		}
 		replaceStr = replaceStr.replace("<constructor>", constructor);
-		
-		String set="";
+		String set = "";
 		ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-		BufferedWriter bw2 = new BufferedWriter(new OutputStreamWriter(baos2 ));
+		BufferedWriter bw2 = new BufferedWriter(new OutputStreamWriter(baos2));
 		for (int i = 1; i < arr_field.size(); i++)
 		{
 			String var = "";
@@ -445,26 +529,25 @@ public class BuildTool extends DBMain
 			} else if (arr_field.get(i).type.equals("boolean"))
 			{
 				var = "true";
-			}else
+			} else
 			{
-				var = "\""+arr_field.get(i).name+"\"";
+				var = "\"" + arr_field.get(i).name + "\"";
 			}
 			String tab = "";
-			if(i != 1)
+			if (i != 1)
 			{
 				tab = "\t\t";
-			}else
+			} else
 			{
 				tab = "";
 			}
-			bw2.write(tab+getVariableName(tableName)+".set"+makeStrFirstUpper(arr_field.get(i).name)+"("+var +");");
+			bw2.write(tab + getVariableName(tableName) + ".set" + makeStrFirstUpper(arr_field.get(i).name) + "(" + var + ");");
 			bw2.newLine();
 		}
 		baos2.close();
 		bw2.close();
 		set = baos2.toString();
-		replaceStr = replaceStr.replace("<set>",set);
-		
+		replaceStr = replaceStr.replace("<set>", set);
 		System.out.println(replaceStr);
 		return replaceStr;
 	}
@@ -478,6 +561,10 @@ public class BuildTool extends DBMain
 		int columnCount = data.getColumnCount();
 		String className = makeStrFirstUpper(tableName);
 		ArrayList<Field> arr_field = new ArrayList<BuildTool.Field>();
+		ArrayList<String> importKeysTableNames = getImportKeysTableNames(tableName);
+		ArrayList<String> exportKeysTableNames = getExportKeysTableNames(tableName);
+		ArrayList<Field> arr_relationship = new ArrayList<BuildTool.Field>();
+		
 		bw.write("public class " + className);
 		bw.newLine();
 		bw.write("{");
@@ -492,7 +579,21 @@ public class BuildTool extends DBMain
 			bw.write(columnName + ";");
 			bw.newLine();
 		}
+		for(int i = 0;i < importKeysTableNames.size();i++)// 打印导入的键
+		{
+			bw.write("\tprivate "+getClassName(importKeysTableNames.get(i))+" "+getVariableName(importKeysTableNames.get(i))+";");
+			arr_relationship.add(new Field(getClassName(importKeysTableNames.get(i)),getVariableName(importKeysTableNames.get(i))));
+			bw.newLine();
+		}
+		for(int i =0;i < exportKeysTableNames.size();i++)// 打印导出的键
+		{
+			bw.write("\tprivate ArrayList<"+getClassName(exportKeysTableNames.get(i))+"> "+getVariableName(exportKeysTableNames.get(i))+";");
+			arr_relationship.add(new Field("ArrayList<"+getClassName(exportKeysTableNames.get(i))+">",getVariableName(exportKeysTableNames.get(i))));
+			bw.newLine();
+		}
 		bw.newLine();
+		
+		
 		bw.write("\tpublic " + className + "()");// 打印构造方法1
 		bw.newLine();
 		bw.write("\t{");
@@ -518,6 +619,7 @@ public class BuildTool extends DBMain
 		bw.write("\t}");
 		bw.newLine();
 		bw.newLine();
+		
 		for (int i = 1; i <= columnCount; i++)
 		{// 打印方法
 			String columnClassName = data.getColumnClassName(i);
@@ -529,14 +631,14 @@ public class BuildTool extends DBMain
 			bw.newLine();
 			bw.write("\t{");
 			bw.newLine();
-			bw.write("\t\treturn " + columnName + ";");
+			bw.write("\t\tthis." + columnName + " = "+columnName+";");
 			bw.newLine();
 			bw.write("\t}");
 			bw.newLine();
 			bw.newLine();
 			// is
 			String makeStrFirstUpper = makeStrFirstUpper(columnName);
-			if (reallyColumnClassName.equals("Boolean"))
+			if (reallyColumnClassName.equals("boolean"))
 			{
 				get = "is";
 				if (makeStrFirstUpper.startsWith("Is"))
@@ -555,17 +657,25 @@ public class BuildTool extends DBMain
 			bw.newLine();
 			bw.newLine();
 		}
+		// 打印关系的GetSet方法
+		printGetSet(bw,arr_relationship);
+		
 		String methodName = "\tpublic String toString()";// toString
 		bw.write(methodName);
 		bw.newLine();
 		bw.write("\t" + "{");
 		bw.newLine();
 		bw.write("\t\treturn ");
-		for (int i = 0; i < arr_field.size() - 1; i++)
+		for (int i = 0; i < arr_field.size(); i++)
 		{
 			bw.write(arr_field.get(i).name + "+\"\\t\"+");
 		}
-		bw.write(arr_field.get(arr_field.size() - 1).name + ";");
+		for(int i =0; i < arr_relationship.size() - 1;i++)
+		{
+			String variable = arr_relationship.get(i).name;
+			bw.write("(this."+variable+" == null ? \"\" : \"\\t\"+"+variable+") +");
+		}
+		bw.write("(this."+arr_relationship.get(arr_relationship.size() - 1).name+" == null ? \"\" : \"\\t\"+"+arr_relationship.get(arr_relationship.size() - 1).name+");");
 		bw.newLine();
 		bw.write("\t}");
 		bw.newLine();
@@ -576,6 +686,46 @@ public class BuildTool extends DBMain
 		baos.close();
 		baos.writeTo(System.out);
 		return baos.toString();
+	}
+	private void printGetSet(BufferedWriter bw,ArrayList<BuildTool.Field> arr) throws IOException
+	{
+		for(int i =0 ;i < arr.size();i++)
+		{
+			String type = arr.get(i).type;
+			String variable = arr.get(i).name;
+			String makeVariableFirstUpper = makeStrFirstUpper(variable);
+			String get = "get";
+			//set
+			bw.write("\tpublic set"+makeVariableFirstUpper+"("+type+" "+variable+")");
+			bw.newLine();
+			bw.write("\t{");
+			bw.newLine();
+			bw.write("\t\tthis."+variable+" = "+variable+";");
+			bw.newLine();
+			bw.write("\t}");
+			bw.newLine();
+			bw.newLine();
+			//is
+			if (type.equals("boolean"))
+			{
+				get = "is";
+				if (makeVariableFirstUpper.startsWith("Is"))
+				{
+					makeVariableFirstUpper = removeIs(makeVariableFirstUpper);
+				}
+			}
+			//get
+			bw.write("\tpublic "+get+makeVariableFirstUpper+"()");
+			bw.newLine();
+			bw.write("\t{");
+			bw.newLine();
+			bw.write("\t\treturn "+variable+";");
+			bw.newLine();
+			bw.write("\t}");
+			bw.newLine();
+			bw.newLine();
+			
+		}
 	}
 	private String getClassName(String tableName)
 	{
