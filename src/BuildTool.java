@@ -125,7 +125,7 @@ public class BuildTool extends DBMain
 		ArrayList<String> arr = new ArrayList<String>();
 		con = DriverManager.getConnection("jdbc:sqlserver://" + host + ":" + port + ";databaseName=" + dataBaseName, username, password);
 		DatabaseMetaData metaData = con.getMetaData();
-		ResultSet importKeys = metaData.getImportedKeys(con.getCatalog(), null, tableName);//获取结果集后将自动关闭连接
+		ResultSet importKeys = metaData.getImportedKeys(con.getCatalog(), null, tableName);// 获取结果集后将自动关闭连接
 		while (importKeys.next())
 		{
 			String fkColumnName = importKeys.getString("FKCOLUMN_NAME");
@@ -133,7 +133,7 @@ public class BuildTool extends DBMain
 			String pkColumnName = importKeys.getString("PKCOLUMN_NAME");
 			arr.add(pkTablenName);
 		}
-		realese(); 
+		realese();
 		return arr;
 	}
 	private ArrayList<String> getImportKeysFKColumnNames(String tableName) throws SQLException
@@ -141,7 +141,7 @@ public class BuildTool extends DBMain
 		ArrayList<String> arr = new ArrayList<String>();
 		con = DriverManager.getConnection("jdbc:sqlserver://" + host + ":" + port + ";databaseName=" + dataBaseName, username, password);
 		DatabaseMetaData metaData = con.getMetaData();
-		ResultSet importKeys = metaData.getImportedKeys(con.getCatalog(), null, tableName);//获取结果集后将自动关闭连接
+		ResultSet importKeys = metaData.getImportedKeys(con.getCatalog(), null, tableName);// 获取结果集后将自动关闭连接
 		while (importKeys.next())
 		{
 			String fkColumnName = importKeys.getString("FKCOLUMN_NAME");
@@ -149,7 +149,7 @@ public class BuildTool extends DBMain
 			String pkColumnName = importKeys.getString("PKCOLUMN_NAME");
 			arr.add(fkColumnName);
 		}
-		realese(); 
+		realese();
 		return arr;
 	}
 	private ArrayList<String> getExportKeysTableNames(String tableName) throws SQLException
@@ -173,7 +173,7 @@ public class BuildTool extends DBMain
 	{
 		ArrayList<Field> arr_field = new ArrayList<BuildTool.Field>();
 		ArrayList<String> arr = getImportKeysTableNames(tableName);
-		for(String str : arr)
+		for (String str : arr)
 		{
 			arr_field.add(new Field(getClassName(str), getVariableName(str)));
 		}
@@ -183,7 +183,7 @@ public class BuildTool extends DBMain
 	{
 		ArrayList<Field> arr_field = new ArrayList<BuildTool.Field>();
 		ArrayList<String> arr = getExportKeysTableNames(tableName);
-		for(String str : arr)
+		for (String str : arr)
 		{
 			arr_field.add(new Field(getClassName(str), getVariableName(str)));
 		}
@@ -249,8 +249,20 @@ public class BuildTool extends DBMain
 	}
 	public String buildDAO(String tableName) throws IOException, SQLException, ClassNotFoundException
 	{
+		return buildDAO(tableName,null);
+	}
+	public String buildDAO(String tableName,String packageName) throws IOException, SQLException, ClassNotFoundException
+	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(baos));
+		printPackage(bw, tableName, packageName);
+		bw.write("import java.sql.ResultSet;");
+		bw.newLine();
+		bw.write("import java.sql.SQLException;");
+		bw.newLine();
+		bw.write("import "+DirectoryManager.getPackageNameDBMain(packageName)+".DBMain;");
+		bw.newLine();
+		printImportAll(packageName, bw, getImportKeysTableNames(tableName), getExportKeysTableNames(tableName));
 		Class_ class_ = getClass(tableName);
 		String class_name = class_.className;
 		ArrayList<Field> arr_field = class_.arr_field;
@@ -265,13 +277,6 @@ public class BuildTool extends DBMain
 			} else if (m.methodName.startsWith("set"))
 				arr_method_set.add(m);
 		}
-		bw.write("import java.sql.ResultSet;");
-		bw.newLine();
-		bw.write("import java.sql.SQLException;");
-		bw.newLine();
-		bw.write("import java.util.ArrayList;");
-		bw.newLine();
-		bw.newLine();
 		bw.write("public class " + class_name + "DAO extends DBMain<" + class_name + ">");
 		bw.newLine();
 		bw.write("{");
@@ -347,7 +352,7 @@ public class BuildTool extends DBMain
 		sql2 += "\";";
 		bw.write(sql2);
 		bw.newLine();
-		bw.write("pst = this.getPreparedStatement(sql);");
+		bw.write("\t\tpst = this.getPreparedStatement(sql);");
 		bw.newLine();
 		for (int i = 1; i < arr_method_get.size(); i++)
 		{
@@ -444,6 +449,7 @@ public class BuildTool extends DBMain
 		bw.newLine();
 		bw.write("\t}");
 		bw.newLine();
+		printGetDetailById(tableName, bw, getImportKeysFields(tableName), getExportKeysFields(tableName));
 		bw.write("}");
 		realese();
 		bw.close();
@@ -451,18 +457,29 @@ public class BuildTool extends DBMain
 		baos.writeTo(System.out);
 		return baos.toString();
 	}
-	private void printGetDetailById(ByteArrayOutputStream baos,ArrayList<Field> arr_field)
+	private void printGetDetailById(String tableName, BufferedWriter bw, ArrayList<Field> arr_importField, ArrayList<Field> arr_exportField) throws IOException
 	{
+		bw.write("\tpublic " + getClassName(tableName) + " getDetailById(int id) throws ClassNotFoundException, SQLException");
+		bw.newLine();
+		bw.write("\t{");
+		bw.newLine();
+		bw.write("\t\treturn null;");
+		bw.newLine();
+		bw.write("\t}");
+		bw.newLine();
 		String sql = "select * from <table1>,<table2> where <table1>.<importKey_columnName> = <table2>.<importKey_columnName> and <table1>.<table1_id> = ?";
-		printImportKeysTable(baos,arr_field);
+		printImportKeysTable(bw, arr_importField);
 	}
-	private void printImportKeysTable(ByteArrayOutputStream baos,ArrayList<Field> arr_field)
+	private void printImportKeysTable(BufferedWriter bw, ArrayList<Field> arr_field)
 	{
-		Field field1 = arr_field.get(0);
+//		Field field1 = arr_field.get(0);
 		// TODO Auto-generated method stub
-		
 	}
 	public String buildDBMain() throws IOException
+	{
+		return buildDBMain(null);
+	}
+	public String buildDBMain(String packageName) throws IOException
 	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(baos));
@@ -476,13 +493,24 @@ public class BuildTool extends DBMain
 		baos.close();
 		bw.close();
 		fis.close();
-		baos.writeTo(System.out);
-		return baos.toString();
+		String str = baos.toString();
+		if(packageName != null && !packageName.equals(""))
+			str = str.replace("<package>", "package "+DirectoryManager.getPackageNameDBMain(packageName)+";");
+		else
+			str = str.replace("<package>","");
+		System.out.println(str);
+		return str;
 	}
 	public String buildDAOTest(String tableName) throws IOException, SQLException, ClassNotFoundException
 	{
+		return buildDAOTest(tableName,null);
+	}
+	public String buildDAOTest(String tableName,String packageName) throws IOException, SQLException, ClassNotFoundException
+	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(baos));
+		printPackage(bw, tableName, packageName);
+		printImportAll(packageName, bw, getImportKeysTableNames(tableName), getExportKeysTableNames(tableName));
 		InputStream fis = this.getClass().getClassLoader().getResourceAsStream("DAOTest");
 		ArrayList<Method> arr_method = getMethod(tableName);
 		ArrayList<Field> arr_field = getField(tableName);
@@ -504,7 +532,11 @@ public class BuildTool extends DBMain
 			if (arr_field.get(i).type.equals("int") || arr_field.get(i).type.equals("double"))
 			{
 				constructor += "1";
-			} else if (arr_field.get(i).type.equals("boolean"))
+			}else if(arr_field.get(i).type.equals("float"))
+			{
+				constructor += "1.0f";
+			}
+			else if (arr_field.get(i).type.equals("boolean"))
 			{
 				constructor += "true";
 			} else
@@ -553,6 +585,10 @@ public class BuildTool extends DBMain
 	}
 	public String buildClass(String tableName) throws ClassNotFoundException, SQLException, IOException
 	{
+		return buildClass(tableName, null);
+	}
+	public String buildClass(String tableName, String packageName) throws ClassNotFoundException, SQLException, IOException
+	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(baos));
 		pst = getPreparedStatement("select * from " + tableName);
@@ -564,6 +600,8 @@ public class BuildTool extends DBMain
 		ArrayList<String> importKeysTableNames = getImportKeysTableNames(tableName);
 		ArrayList<String> exportKeysTableNames = getExportKeysTableNames(tableName);
 		ArrayList<Field> arr_relationship = new ArrayList<BuildTool.Field>();
+		printPackage(bw,tableName, packageName);
+		printImportAll(packageName, bw, importKeysTableNames, exportKeysTableNames);
 		
 		bw.write("public class " + className);
 		bw.newLine();
@@ -579,21 +617,19 @@ public class BuildTool extends DBMain
 			bw.write(columnName + ";");
 			bw.newLine();
 		}
-		for(int i = 0;i < importKeysTableNames.size();i++)// 打印导入的键
+		for (int i = 0; i < importKeysTableNames.size(); i++)// 打印导入的键
 		{
-			bw.write("\tprivate "+getClassName(importKeysTableNames.get(i))+" "+getVariableName(importKeysTableNames.get(i))+";");
-			arr_relationship.add(new Field(getClassName(importKeysTableNames.get(i)),getVariableName(importKeysTableNames.get(i))));
+			bw.write("\tprivate " + getClassName(importKeysTableNames.get(i)) + " " + getVariableName(importKeysTableNames.get(i)) + ";");
+			arr_relationship.add(new Field(getClassName(importKeysTableNames.get(i)), getVariableName(importKeysTableNames.get(i))));
 			bw.newLine();
 		}
-		for(int i =0;i < exportKeysTableNames.size();i++)// 打印导出的键
+		for (int i = 0; i < exportKeysTableNames.size(); i++)// 打印导出的键
 		{
-			bw.write("\tprivate ArrayList<"+getClassName(exportKeysTableNames.get(i))+"> "+getVariableName(exportKeysTableNames.get(i))+";");
-			arr_relationship.add(new Field("ArrayList<"+getClassName(exportKeysTableNames.get(i))+">",getVariableName(exportKeysTableNames.get(i))));
+			bw.write("\tprivate ArrayList<" + getClassName(exportKeysTableNames.get(i)) + "> " + getVariableName(exportKeysTableNames.get(i)) + ";");
+			arr_relationship.add(new Field("ArrayList<" + getClassName(exportKeysTableNames.get(i)) + ">", getVariableName(exportKeysTableNames.get(i))));
 			bw.newLine();
 		}
 		bw.newLine();
-		
-		
 		bw.write("\tpublic " + className + "()");// 打印构造方法1
 		bw.newLine();
 		bw.write("\t{");
@@ -619,7 +655,6 @@ public class BuildTool extends DBMain
 		bw.write("\t}");
 		bw.newLine();
 		bw.newLine();
-		
 		for (int i = 1; i <= columnCount; i++)
 		{// 打印方法
 			String columnClassName = data.getColumnClassName(i);
@@ -631,7 +666,7 @@ public class BuildTool extends DBMain
 			bw.newLine();
 			bw.write("\t{");
 			bw.newLine();
-			bw.write("\t\tthis." + columnName + " = "+columnName+";");
+			bw.write("\t\tthis." + columnName + " = " + columnName + ";");
 			bw.newLine();
 			bw.write("\t}");
 			bw.newLine();
@@ -658,8 +693,7 @@ public class BuildTool extends DBMain
 			bw.newLine();
 		}
 		// 打印关系的GetSet方法
-		printGetSet(bw,arr_relationship);
-		
+		printGetSet(bw, arr_relationship);
 		String methodName = "\tpublic String toString()";// toString
 		bw.write(methodName);
 		bw.newLine();
@@ -670,12 +704,13 @@ public class BuildTool extends DBMain
 		{
 			bw.write(arr_field.get(i).name + "+\"\\t\"+");
 		}
-		for(int i =0; i < arr_relationship.size() - 1;i++)
+		for (int i = 0; i < arr_relationship.size() - 1; i++)
 		{
 			String variable = arr_relationship.get(i).name;
-			bw.write("(this."+variable+" == null ? \"\" : \"\\t\"+"+variable+") +");
+			bw.write("(this." + variable + " == null ? \"\" : \"\\t\"+" + variable + ") +");
 		}
-		bw.write("(this."+arr_relationship.get(arr_relationship.size() - 1).name+" == null ? \"\" : \"\\t\"+"+arr_relationship.get(arr_relationship.size() - 1).name+");");
+		if (arr_relationship.size() - 1 >= 0)
+			bw.write("(this." + arr_relationship.get(arr_relationship.size() - 1).name + " == null ? \"\" : \"\\t\"+" + arr_relationship.get(arr_relationship.size() - 1).name + ");");
 		bw.newLine();
 		bw.write("\t}");
 		bw.newLine();
@@ -687,25 +722,54 @@ public class BuildTool extends DBMain
 		baos.writeTo(System.out);
 		return baos.toString();
 	}
-	private void printGetSet(BufferedWriter bw,ArrayList<BuildTool.Field> arr) throws IOException
+	private void printImportAll(String packageName, BufferedWriter bw, ArrayList<String> importKeysTableNames, ArrayList<String> exportKeysTableNames) throws IOException
 	{
-		for(int i =0 ;i < arr.size();i++)
+		bw.write("import java.util.ArrayList;");
+		bw.newLine();
+		printImport(bw, importKeysTableNames, packageName);
+		printImport(bw, exportKeysTableNames, packageName);
+	}
+	private void printPackage(BufferedWriter bw, String tableName, String packageName) throws IOException
+	{
+		if (packageName != null && !packageName.equals(""))
+		{
+			bw.write("package " + DirectoryManager.getPackageNameByTableName(packageName, tableName)+";");
+			bw.newLine();
+			bw.newLine();
+		}
+	}
+	private void printImport(BufferedWriter bw,ArrayList<String> tableNames, String packageName) throws IOException
+	{
+		if (packageName != null && !packageName.equals(""))
+		{
+			for(int i = 0;i < tableNames.size();i++)
+			{
+				bw.write("import " + DirectoryManager.getPackageNameByTableName(packageName, tableNames.get(i))+"."+getClassName(tableNames.get(i))+";");
+				bw.newLine();
+			}
+			if(tableNames.size() != 0)
+				bw.newLine();
+		}
+	}
+	private void printGetSet(BufferedWriter bw, ArrayList<BuildTool.Field> arr) throws IOException
+	{
+		for (int i = 0; i < arr.size(); i++)
 		{
 			String type = arr.get(i).type;
 			String variable = arr.get(i).name;
 			String makeVariableFirstUpper = makeStrFirstUpper(variable);
 			String get = "get";
-			//set
-			bw.write("\tpublic set"+makeVariableFirstUpper+"("+type+" "+variable+")");
+			// set
+			bw.write("\tpublic void set" + makeVariableFirstUpper + "(" + type + " " + variable + ")");
 			bw.newLine();
 			bw.write("\t{");
 			bw.newLine();
-			bw.write("\t\tthis."+variable+" = "+variable+";");
+			bw.write("\t\tthis." + variable + " = " + variable + ";");
 			bw.newLine();
 			bw.write("\t}");
 			bw.newLine();
 			bw.newLine();
-			//is
+			// is
 			if (type.equals("boolean"))
 			{
 				get = "is";
@@ -714,17 +778,16 @@ public class BuildTool extends DBMain
 					makeVariableFirstUpper = removeIs(makeVariableFirstUpper);
 				}
 			}
-			//get
-			bw.write("\tpublic "+get+makeVariableFirstUpper+"()");
+			// get
+			bw.write("\tpublic " + type + " " + get + makeVariableFirstUpper + "()");
 			bw.newLine();
 			bw.write("\t{");
 			bw.newLine();
-			bw.write("\t\treturn "+variable+";");
+			bw.write("\t\treturn " + variable + ";");
 			bw.newLine();
 			bw.write("\t}");
 			bw.newLine();
 			bw.newLine();
-			
 		}
 	}
 	private String getClassName(String tableName)
@@ -760,12 +823,12 @@ public class BuildTool extends DBMain
 	}
 	private String makeWrapperClassToPreClass(String str)
 	{
-		if (str.equals("Integer"))
+		if (str.equals("Boolean") || str.equals("Double") || str.equals("Float"))
+		{
+			return makeStrFirstLower(str);
+		}else if(str.equals("Integer"))
 		{
 			return "int";
-		} else if (str.equals("Boolean"))
-		{
-			return "bool";
 		}
 		return str;
 	}

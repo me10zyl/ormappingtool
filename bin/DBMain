@@ -1,3 +1,5 @@
+<package>
+
 /**
  * 用于代码复用，即放置所有DB表操作类中的相同代码
  * 是所有DB表操作类的父类
@@ -39,7 +41,7 @@ public abstract class DBMain<T>
 		 con = DriverManager.getConnection("jdbc:sqlserver://100.1.0.46:1433;databaseName=bookshop_case", "sa", "sa");
 		//-------封装SQL语句---------------------
 		//String sql = "select * from users";
-		 pst =  con.prepareStatement(sql);
+		 pst =  con.prepareStatement(sql,ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY,ResultSet.HOLD_CURSORS_OVER_COMMIT);
 		 return pst;
 	}
 	/**
@@ -66,7 +68,9 @@ public abstract class DBMain<T>
 	public abstract ArrayList<T> getAll() throws ClassNotFoundException,SQLException;
 	
 	public abstract T getById(int id) throws ClassNotFoundException,SQLException;
-		
+	
+	public abstract T getDetailById(int id) throws ClassNotFoundException,SQLException;
+	
 	public abstract void add(T user) throws ClassNotFoundException,SQLException;
 	
 	public abstract void modify(T newUser) throws ClassNotFoundException,SQLException;
