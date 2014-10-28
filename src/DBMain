@@ -36,9 +36,9 @@ public abstract class DBMain<T>
 	protected PreparedStatement getPreparedStatement(String sql) throws ClassNotFoundException, SQLException
 	{
 		//------加载数据库驱动---------------------
-		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+		Class.forName("<driver>");
 		//------获得数据库连接----------------------
-		 con = DriverManager.getConnection("jdbc:sqlserver://100.1.0.46:1433;databaseName=bookshop_case", "sa", "sa");
+		 con = DriverManager.getConnection("<url>", "<user>", "<password>");
 		//-------封装SQL语句---------------------
 		//String sql = "select * from users";
 		 pst =  con.prepareStatement(sql,ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY,ResultSet.HOLD_CURSORS_OVER_COMMIT);

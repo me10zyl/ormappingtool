@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -13,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 
 public class BuildTool extends DBMain
 {
@@ -21,8 +23,11 @@ public class BuildTool extends DBMain
 	private String dataBaseName;
 	private String username;
 	private String password;
+	private String dataBaseSoft;
+	public static String DATABASE_MYSQL = "MySQL";
+	public static String DATABASE_SQLSERVER = "SQL Server";
 
-	public BuildTool(String host, String port, String dataBaseName, String username, String password)
+	public BuildTool(String host, String port, String dataBaseName, String username, String password, String dataBaseSoft)
 	{
 		super();
 		this.host = host;
@@ -30,6 +35,7 @@ public class BuildTool extends DBMain
 		this.dataBaseName = dataBaseName;
 		this.username = username;
 		this.password = password;
+		this.dataBaseSoft = dataBaseSoft;
 	}
 
 	private class Field
@@ -96,7 +102,7 @@ public class BuildTool extends DBMain
 	public ArrayList<String> getTables() throws SQLException
 	{
 		ArrayList<String> arr = new ArrayList<String>();
-		con = DriverManager.getConnection("jdbc:sqlserver://" + host + ":" + port + ";databaseName=" + dataBaseName, username, password);
+		con = getConnection();
 		ResultSet rs = con.getMetaData().getTables(null, null, null, new String[]
 		{ "TABLE" });
 		while (rs.next())
@@ -111,7 +117,7 @@ public class BuildTool extends DBMain
 		// pst =
 		// getPreparedStatement("SELECT Name FROM Master..SysDatabases ORDER BY Name");
 		// rst = pst.executeQuery();
-		con = DriverManager.getConnection("jdbc:sqlserver://" + host + ":" + port + ";databaseName=" + dataBaseName, username, password);
+		con = getConnection();
 		DatabaseMetaData metaData = con.getMetaData();
 		rst = metaData.getCatalogs();
 		while (rst.next())
@@ -123,7 +129,7 @@ public class BuildTool extends DBMain
 	private ArrayList<String> getImportKeysTableNames(String tableName) throws SQLException
 	{
 		ArrayList<String> arr = new ArrayList<String>();
-		con = DriverManager.getConnection("jdbc:sqlserver://" + host + ":" + port + ";databaseName=" + dataBaseName, username, password);
+		con = getConnection();
 		DatabaseMetaData metaData = con.getMetaData();
 		ResultSet importKeys = metaData.getImportedKeys(con.getCatalog(), null, tableName);// 获取结果集后将自动关闭连接
 		while (importKeys.next())
@@ -139,7 +145,7 @@ public class BuildTool extends DBMain
 	private ArrayList<String> getImportKeysFKColumnNames(String tableName) throws SQLException
 	{
 		ArrayList<String> arr = new ArrayList<String>();
-		con = DriverManager.getConnection("jdbc:sqlserver://" + host + ":" + port + ";databaseName=" + dataBaseName, username, password);
+		con = getConnection();
 		DatabaseMetaData metaData = con.getMetaData();
 		ResultSet importKeys = metaData.getImportedKeys(con.getCatalog(), null, tableName);// 获取结果集后将自动关闭连接
 		while (importKeys.next())
@@ -155,7 +161,7 @@ public class BuildTool extends DBMain
 	private ArrayList<String> getExportKeysTableNames(String tableName) throws SQLException
 	{
 		ArrayList<String> arr = new ArrayList<String>();
-		con = DriverManager.getConnection("jdbc:sqlserver://" + host + ":" + port + ";databaseName=" + dataBaseName, username, password);
+		con = getConnection();
 		DatabaseMetaData metaData = con.getMetaData();
 		ResultSet exportedKeys = metaData.getExportedKeys(con.getCatalog(), null, tableName);
 		while (exportedKeys.next())
@@ -249,9 +255,9 @@ public class BuildTool extends DBMain
 	}
 	public String buildDAO(String tableName) throws IOException, SQLException, ClassNotFoundException
 	{
-		return buildDAO(tableName,null);
+		return buildDAO(tableName, null);
 	}
-	public String buildDAO(String tableName,String packageName) throws IOException, SQLException, ClassNotFoundException
+	public String buildDAO(String tableName, String packageName) throws IOException, SQLException, ClassNotFoundException
 	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(baos));
@@ -260,7 +266,7 @@ public class BuildTool extends DBMain
 		bw.newLine();
 		bw.write("import java.sql.SQLException;");
 		bw.newLine();
-		bw.write("import "+DirectoryManager.getPackageNameDBMain(packageName)+".DBMain;");
+		bw.write("import " + DirectoryManager.getPackageNameDBMain(packageName) + ".DBMain;");
 		bw.newLine();
 		printImportAll(packageName, bw, getImportKeysTableNames(tableName), getExportKeysTableNames(tableName));
 		Class_ class_ = getClass(tableName);
@@ -494,18 +500,29 @@ public class BuildTool extends DBMain
 		bw.close();
 		fis.close();
 		String str = baos.toString();
-		if(packageName != null && !packageName.equals(""))
-			str = str.replace("<package>", "package "+DirectoryManager.getPackageNameDBMain(packageName)+";");
+		if (packageName != null && !packageName.equals(""))
+			str = str.replace("<package>", "package " + DirectoryManager.getPackageNameDBMain(packageName) + ";");
 		else
-			str = str.replace("<package>","");
+			str = str.replace("<package>", "");
+		if (dataBaseSoft.equals(BuildTool.DATABASE_SQLSERVER))
+		{
+			str = str.replace("<driver>", "com.microsoft.sqlserver.jdbc.SQLServerDriver");
+			str = str.replace("<url>", "jdbc:sqlserver://" + host + ":" + port + ";databaseName=" + dataBaseName);
+		} else if (dataBaseSoft.equals(BuildTool.DATABASE_MYSQL))
+		{
+			str = str.replace("<driver>", "com.mysql.jdbc.Driver");
+			str = str.replace("<url>", "jdbc:sqlserver://" + host + ":" + port + "/" + dataBaseName);
+		}
+		str = str.replace("<user>", username);
+		str = str.replace("<password>", password);
 		System.out.println(str);
 		return str;
 	}
 	public String buildDAOTest(String tableName) throws IOException, SQLException, ClassNotFoundException
 	{
-		return buildDAOTest(tableName,null);
+		return buildDAOTest(tableName, null);
 	}
-	public String buildDAOTest(String tableName,String packageName) throws IOException, SQLException, ClassNotFoundException
+	public String buildDAOTest(String tableName, String packageName) throws IOException, SQLException, ClassNotFoundException
 	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(baos));
@@ -532,11 +549,10 @@ public class BuildTool extends DBMain
 			if (arr_field.get(i).type.equals("int") || arr_field.get(i).type.equals("double"))
 			{
 				constructor += "1";
-			}else if(arr_field.get(i).type.equals("float"))
+			} else if (arr_field.get(i).type.equals("float"))
 			{
 				constructor += "1.0f";
-			}
-			else if (arr_field.get(i).type.equals("boolean"))
+			} else if (arr_field.get(i).type.equals("boolean"))
 			{
 				constructor += "true";
 			} else
@@ -600,9 +616,8 @@ public class BuildTool extends DBMain
 		ArrayList<String> importKeysTableNames = getImportKeysTableNames(tableName);
 		ArrayList<String> exportKeysTableNames = getExportKeysTableNames(tableName);
 		ArrayList<Field> arr_relationship = new ArrayList<BuildTool.Field>();
-		printPackage(bw,tableName, packageName);
+		printPackage(bw, tableName, packageName);
 		printImportAll(packageName, bw, importKeysTableNames, exportKeysTableNames);
-		
 		bw.write("public class " + className);
 		bw.newLine();
 		bw.write("{");
@@ -733,21 +748,21 @@ public class BuildTool extends DBMain
 	{
 		if (packageName != null && !packageName.equals(""))
 		{
-			bw.write("package " + DirectoryManager.getPackageNameByTableName(packageName, tableName)+";");
+			bw.write("package " + DirectoryManager.getPackageNameByTableName(packageName, tableName) + ";");
 			bw.newLine();
 			bw.newLine();
 		}
 	}
-	private void printImport(BufferedWriter bw,ArrayList<String> tableNames, String packageName) throws IOException
+	private void printImport(BufferedWriter bw, ArrayList<String> tableNames, String packageName) throws IOException
 	{
 		if (packageName != null && !packageName.equals(""))
 		{
-			for(int i = 0;i < tableNames.size();i++)
+			for (int i = 0; i < tableNames.size(); i++)
 			{
-				bw.write("import " + DirectoryManager.getPackageNameByTableName(packageName, tableNames.get(i))+"."+getClassName(tableNames.get(i))+";");
+				bw.write("import " + DirectoryManager.getPackageNameByTableName(packageName, tableNames.get(i)) + "." + getClassName(tableNames.get(i)) + ";");
 				bw.newLine();
 			}
-			if(tableNames.size() != 0)
+			if (tableNames.size() != 0)
 				bw.newLine();
 		}
 	}
@@ -826,7 +841,7 @@ public class BuildTool extends DBMain
 		if (str.equals("Boolean") || str.equals("Double") || str.equals("Float"))
 		{
 			return makeStrFirstLower(str);
-		}else if(str.equals("Integer"))
+		} else if (str.equals("Integer"))
 		{
 			return "int";
 		}
@@ -836,12 +851,34 @@ public class BuildTool extends DBMain
 	protected PreparedStatement getPreparedStatement(String sql) throws ClassNotFoundException, SQLException
 	{
 		// ------加载数据库驱动---------------------
-		Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+		forName();
 		// ------获得数据库连接----------------------
-		con = DriverManager.getConnection("jdbc:sqlserver://" + host + ":" + port + ";databaseName=" + dataBaseName, username, password);
+		con = getConnection();
 		// -------封装SQL语句---------------------
 		// String sql = "select * from users";
 		pst = con.prepareStatement(sql);
 		return pst;
+	}
+	private void forName() throws ClassNotFoundException
+	{
+		String driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
+		if (dataBaseSoft.equals(BuildTool.DATABASE_SQLSERVER))
+		{
+		} else if (dataBaseSoft.equals(BuildTool.DATABASE_MYSQL))
+		{
+			driver = "com.mysql.jdbc.Driver";
+		}
+		Class.forName(driver);
+	}
+	private Connection getConnection() throws SQLException
+	{
+		String url = "jdbc:sqlserver://" + host + ":" + port + ";databaseName=" + dataBaseName;
+		if (dataBaseSoft.equals(BuildTool.DATABASE_SQLSERVER))
+		{
+		} else if (dataBaseSoft.equals(BuildTool.DATABASE_MYSQL))
+		{
+			url = "jdbc:sqlserver://" + host + ":" + port + "/" + dataBaseName;
+		}
+		return DriverManager.getConnection(url, username, password);
 	}
 }

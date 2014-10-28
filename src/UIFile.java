@@ -36,11 +36,12 @@ public class UIFile extends javax.swing.JDialog
 	private String username;
 	private String password;
 	private String tableName;
-
+	private String dataBaseSoft;
 	/**
 	 * Auto-generated main method to display this JDialog
+	 * @param dataBaseSoft TODO
 	 */
-	public UIFile(JFrame frame, String host, String port, String dataBaseName, String username, String password, String tableName)
+	public UIFile(JFrame frame, String host, String port, String dataBaseName, String username, String password, String tableName, String dataBaseSoft)
 	{
 		super(frame);
 		this.parent = frame;
@@ -101,7 +102,7 @@ public class UIFile extends javax.swing.JDialog
 								{
 									try
 									{
-										final BuildTool tool = new BuildTool(host, port, dataBaseName, username, password);
+										final BuildTool tool = new BuildTool(host, port, dataBaseName, username, password, dataBaseSoft);
 										ArrayList<String> tables = tool.getTables();
 										generateDBMain(tool, DirectoryManager.getDBMainPathName());
 										for (int j = 0; j < tables.size(); j++)
@@ -161,7 +162,7 @@ public class UIFile extends javax.swing.JDialog
 								{
 									try
 									{
-										final BuildTool tool = new BuildTool(host, port, dataBaseName, username, password);
+										final BuildTool tool = new BuildTool(host, port, dataBaseName, username, password, dataBaseSoft);
 										generateDBMain(tool, DirectoryManager.getDBMainPathName());
 										generateJavas(tool, tableName, DirectoryManager.getClassDAODAOTestPathDir(tableName));
 										JOptionPane.showMessageDialog(UIFile.this, "³É¹¦!");

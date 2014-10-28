@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
@@ -54,6 +55,7 @@ public class UIMain extends javax.swing.JFrame
 	private ArrayList<String> arr_model2;
 	private JScrollPane jScrollPane4;
 	private JTextArea jTextArea4;
+	private JComboBox jcb_dataBase;
 	private JButton jb_about;
 	private JButton jb_file;
 
@@ -97,7 +99,7 @@ public class UIMain extends javax.swing.JFrame
 				{
 					// TODO add your code for
 					// jb_about.actionPerformed
-					JOptionPane.showMessageDialog(UIMain.this, "目前仅支持SQL Server\n如有Bug，请@zyl");
+					JOptionPane.showMessageDialog(UIMain.this, "目前仅支持SQL Server,MySQL\n如有Bug，请@zyl");
 				}
 			});
 		}
@@ -158,6 +160,13 @@ public class UIMain extends javax.swing.JFrame
 		jf_port.setColumns(5);
 		jf_port.setText("1433");
 		{
+			ComboBoxModel jcb_dataBaseModel = 
+					new DefaultComboBoxModel(
+							new String[] { BuildTool.DATABASE_SQLSERVER, BuildTool.DATABASE_MYSQL });
+			jcb_dataBase = new JComboBox();
+			jcb_dataBase.setModel(jcb_dataBaseModel);
+		}
+		{
 			arr_model2 = new ArrayList<String>();
 			model2 = new jComboboxModel(arr_model2);
 			jComboBox2 = new JComboBox();
@@ -167,10 +176,39 @@ public class UIMain extends javax.swing.JFrame
 		jf_dbname.setText("bookshop_case");
 		javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
 		jPanel3.setLayout(jPanel3Layout);
-		jPanel3Layout.setVerticalGroup(jPanel3Layout.createSequentialGroup().addGroup(jPanel3Layout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(jf_address, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE).addComponent(jLabel3, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(jLabel4, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(jf_port, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-				.addGroup(jPanel3Layout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(jComboBox2, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(jf_dbname, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(jLabel6, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)).addContainerGap());
-		jPanel3Layout.setHorizontalGroup(jPanel3Layout.createParallelGroup().addGroup(GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup().addComponent(jLabel6, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addComponent(jf_dbname, GroupLayout.PREFERRED_SIZE, 126, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED).addComponent(jComboBox2, 0, 175, Short.MAX_VALUE))
-				.addGroup(GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup().addComponent(jLabel3, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addComponent(jf_address, 0, 209, Short.MAX_VALUE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 0, GroupLayout.PREFERRED_SIZE).addComponent(jLabel4, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED).addComponent(jf_port, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE).addGap(15)));
+		jPanel3Layout.setVerticalGroup(jPanel3Layout.createSequentialGroup()
+			.addGroup(jPanel3Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+			    .addComponent(jcb_dataBase, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+			    .addComponent(jf_address, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+			    .addComponent(jLabel3, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+			    .addComponent(jLabel4, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+			    .addComponent(jf_port, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, 22, GroupLayout.PREFERRED_SIZE))
+			.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+			.addGroup(jPanel3Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+			    .addComponent(jComboBox2, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+			    .addComponent(jf_dbname, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+			    .addComponent(jLabel6, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))
+			.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED));
+		jPanel3Layout.setHorizontalGroup(jPanel3Layout.createSequentialGroup()
+			.addGroup(jPanel3Layout.createParallelGroup()
+			    .addGroup(GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
+			        .addComponent(jLabel6, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+			        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+			        .addComponent(jf_dbname, GroupLayout.PREFERRED_SIZE, 126, GroupLayout.PREFERRED_SIZE)
+			        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED))
+			    .addGroup(GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
+			        .addComponent(jLabel3, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+			        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+			        .addComponent(jf_address, GroupLayout.PREFERRED_SIZE, 143, GroupLayout.PREFERRED_SIZE)))
+			.addGroup(jPanel3Layout.createParallelGroup()
+			    .addComponent(jComboBox2, GroupLayout.Alignment.LEADING, 0, 182, Short.MAX_VALUE)
+			    .addGroup(GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
+			        .addPreferredGap(jComboBox2, jLabel4, LayoutStyle.ComponentPlacement.INDENT)
+			        .addComponent(jLabel4, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
+			        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+			        .addComponent(jf_port, 0, 53, Short.MAX_VALUE)
+			        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+			        .addComponent(jcb_dataBase, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE))));
 		jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "\u6570\u636e\u5e93\u8868\u540d"));
 		{
 			jb_get = new javax.swing.JButton();
@@ -284,6 +322,7 @@ public class UIMain extends javax.swing.JFrame
 			jf_dbname.setText((String) p.get("dbname"));
 			jf_username.setText((String) p.get("username"));
 			jf_password.setText((String) p.get("password"));
+			jcb_dataBase.setSelectedItem(p.getProperty("dbsoft"));
 			br.close();
 		} catch (FileNotFoundException e1)
 		{
@@ -294,7 +333,7 @@ public class UIMain extends javax.swing.JFrame
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		tool = new BuildTool(jf_address.getText(), jf_port.getText(), jf_dbname.getText(), jf_username.getText(), jf_password.getText());
+		tool = new BuildTool(jf_address.getText(), jf_port.getText(), jf_dbname.getText(), jf_username.getText(), jf_password.getText(), (String)jcb_dataBase.getSelectedItem());
 		arr_model1 = new ArrayList<String>();
 		model1 = new jComboboxModel(arr_model1);
 		jComboBox1.setModel(model1);
@@ -318,7 +357,7 @@ public class UIMain extends javax.swing.JFrame
 				// TODO Auto-generated method stub
 				String str = (String) e.getItem();
 				jf_dbname.setText(str);
-				tool = new BuildTool(jf_address.getText(), jf_port.getText(), jf_dbname.getText(), jf_username.getText(), jf_password.getText());
+				tool = new BuildTool(jf_address.getText(), jf_port.getText(), jf_dbname.getText(), jf_username.getText(), jf_password.getText(),(String)jcb_dataBase.getSelectedItem());
 				try
 				{
 					refreshjComboBox1(tool);
@@ -373,6 +412,7 @@ public class UIMain extends javax.swing.JFrame
 				p.put("dbname", jf_dbname.getText());
 				p.put("username", jf_username.getText());
 				p.put("password", jf_password.getText());
+				p.put("dbsoft", (String)jcb_dataBase.getSelectedItem());
 				PrintWriter pw;
 				try
 				{
@@ -411,7 +451,7 @@ public class UIMain extends javax.swing.JFrame
 		{
 			public void actionPerformed(ActionEvent evt)
 			{
-				UIFile u = new UIFile(UIMain.this, jf_address.getText(), jf_port.getText(), jf_dbname.getText(), jf_username.getText(), jf_password.getText(), jf_tablename.getText());
+				UIFile u = new UIFile(UIMain.this, jf_address.getText(), jf_port.getText(), jf_dbname.getText(), jf_username.getText(), jf_password.getText(), jf_tablename.getText(), (String)jcb_dataBase.getSelectedItem());
 			}
 		});
 	}// </editor-fold>
@@ -427,7 +467,7 @@ public class UIMain extends javax.swing.JFrame
 	private void jb_getActionPerformed(java.awt.event.ActionEvent evt)
 	{
 		// TODO add your handling code here:
-		final BuildTool tool = new BuildTool(jf_address.getText(), jf_port.getText(), jf_dbname.getText(), jf_username.getText(), jf_password.getText());
+		final BuildTool tool = new BuildTool(jf_address.getText(), jf_port.getText(), jf_dbname.getText(), jf_username.getText(), jf_password.getText(), (String)jcb_dataBase.getSelectedItem());
 		try
 		{
 			refreshjComboBox1(tool);
@@ -457,7 +497,7 @@ public class UIMain extends javax.swing.JFrame
 	private void jButton1ActionPerformed(java.awt.event.ActionEvent evt)
 	{
 		// TODO add your handling code here:
-		BuildTool tool = new BuildTool(jf_address.getText(), jf_port.getText(), jf_dbname.getText(), jf_username.getText(), jf_password.getText());
+		BuildTool tool = new BuildTool(jf_address.getText(), jf_port.getText(), jf_dbname.getText(), jf_username.getText(), jf_password.getText(), (String)jcb_dataBase.getSelectedItem());
 		try
 		{
 			String class_ = tool.buildClass(jf_tablename.getText());
