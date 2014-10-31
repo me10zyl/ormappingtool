@@ -51,6 +51,7 @@ public class UIFile extends javax.swing.JDialog
 		this.username = username;
 		this.password = password;
 		this.tableName = tableName;
+		this.dataBaseSoft = dataBaseSoft;
 		initGUI();
 	}
 	private String getClassName(String str)
@@ -102,6 +103,7 @@ public class UIFile extends javax.swing.JDialog
 								{
 									try
 									{
+										System.out.println("dataBaseSoft:"+dataBaseSoft);
 										final BuildTool tool = new BuildTool(host, port, dataBaseName, username, password, dataBaseSoft);
 										ArrayList<String> tables = tool.getTables();
 										generateDBMain(tool, DirectoryManager.getDBMainPathName());

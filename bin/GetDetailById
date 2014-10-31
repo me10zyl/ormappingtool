@@ -1,0 +1,22 @@
+
+	private void setImportKeysMappingObject(<className> <variableName>,String tableName,String importKey,int id) throws ClassNotFoundException, SQLException
+	{
+		String sql = "select * from <tableName> join "+tableName+" on <tableName>."+importKey+" = "+tableName+"."+importKey+" where <table.col0>=?";
+		pst = this.getPreparedStatement(sql);
+		pst.setInt(1, id);
+		rst = pst.executeQuery();
+		// ---------处理结果---------------------
+		if (rst.next()) {
+			<ifEqualsImportTable>
+		}
+	}
+	
+	private void setExportKeysMappingObject(<className> <variableName>, String tableName, String exportKey, int id) throws ClassNotFoundException, SQLException {
+		String sql = "select * from <tableName>," + tableName + " where <tableName>."+exportKey+" = " + tableName + "."+exportKey+" and <tableName>.<table.col0> = ?";
+		pst = this.getPreparedStatement(sql);
+		pst.setInt(1, id);
+		rst = pst.executeQuery();
+		while (rst.next()) {
+			<ifEqualsExportTable>
+		}
+	}

@@ -158,6 +158,22 @@ public class BuildTool extends DBMain
 		realese();
 		return arr;
 	}
+	private ArrayList<String> getExportKeysPKColumnNames(String tableName) throws SQLException
+	{
+		ArrayList<String> arr = new ArrayList<String>();
+		con = getConnection();
+		DatabaseMetaData metaData = con.getMetaData();
+		ResultSet exportedKeys = metaData.getExportedKeys(con.getCatalog(), null, tableName);
+		while (exportedKeys.next())
+		{
+			String fkColumnName = exportedKeys.getString("FKCOLUMN_NAME");
+			String pkTablenName = exportedKeys.getString("PKTABLE_NAME");
+			String pkColumnName = exportedKeys.getString("PKCOLUMN_NAME");
+			arr.add(pkColumnName);
+		}
+		realese();
+		return arr;
+	}
 	private ArrayList<String> getExportKeysTableNames(String tableName) throws SQLException
 	{
 		ArrayList<String> arr = new ArrayList<String>();
@@ -275,6 +291,7 @@ public class BuildTool extends DBMain
 		ArrayList<Method> arr_method = class_.arr_method;
 		ArrayList<Method> arr_method_get = new ArrayList<BuildTool.Method>();
 		ArrayList<Method> arr_method_set = new ArrayList<BuildTool.Method>();
+		System.out.println();
 		for (Method m : arr_method)
 		{
 			if (m.methodName.startsWith("get"))
@@ -455,7 +472,7 @@ public class BuildTool extends DBMain
 		bw.newLine();
 		bw.write("\t}");
 		bw.newLine();
-		printGetDetailById(tableName, bw, getImportKeysFields(tableName), getExportKeysFields(tableName));
+		printGetDetailById(arr_field, tableName, bw, getImportKeysFields(tableName), getExportKeysFields(tableName));
 		bw.write("}");
 		realese();
 		bw.close();
@@ -463,23 +480,86 @@ public class BuildTool extends DBMain
 		baos.writeTo(System.out);
 		return baos.toString();
 	}
-	private void printGetDetailById(String tableName, BufferedWriter bw, ArrayList<Field> arr_importField, ArrayList<Field> arr_exportField) throws IOException
+	private void printGetDetailById(ArrayList<Field> arr_field, String tableName, BufferedWriter bw, ArrayList<Field> arr_importField, ArrayList<Field> arr_exportField) throws IOException, SQLException
 	{
-		bw.write("\tpublic " + getClassName(tableName) + " getDetailById(int id) throws ClassNotFoundException, SQLException");
+		String setExportKeysMappingObject = "setExportKeysMappingObject";
+		String setImportKeysMappingObject = "setImportKeysMappingObject";
+		String currentClass = getClassName(tableName);
+		String currentVariable = getVariableName(tableName);
+		bw.newLine();
+		bw.write("\tpublic " + currentClass + " getDetailById(int id) throws ClassNotFoundException, SQLException");
 		bw.newLine();
 		bw.write("\t{");
 		bw.newLine();
-		bw.write("\t\treturn null;");
+		bw.write("\t\t" + currentClass + " " + currentVariable + " = getById(id);");
+		bw.newLine();
+		for (int i = 0; i < arr_exportField.size(); i++)
+		{
+			bw.write("\t\t" + setExportKeysMappingObject + "(" + currentVariable + ", \"" + arr_exportField.get(i).name + "\", \"" + getExportKeysPKColumnNames(tableName).get(0) + "\", id);");
+			bw.newLine();
+		}
+		for (int i = 0; i < arr_importField.size(); i++)
+		{
+			bw.write("\t\t" + setImportKeysMappingObject + "(" + currentVariable + ", \"" + arr_importField.get(i).name + "\", \"" + getImportKeysFKColumnNames(tableName).get(0) + "\", id);");
+			bw.newLine();
+		}
+		bw.write("\t\tthis.realese();");
+		bw.newLine();
+		bw.write("\t\treturn " + currentVariable + ";");
 		bw.newLine();
 		bw.write("\t}");
 		bw.newLine();
-		String sql = "select * from <table1>,<table2> where <table1>.<importKey_columnName> = <table2>.<importKey_columnName> and <table1>.<table1_id> = ?";
-		printImportKeysTable(bw, arr_importField);
+		printSetImExportKeysMappingObject(arr_field, tableName, bw, arr_importField, arr_exportField);
 	}
-	private void printImportKeysTable(BufferedWriter bw, ArrayList<Field> arr_field)
+	private void printSetImExportKeysMappingObject(ArrayList<Field> arr_field, String tableName, BufferedWriter bw, ArrayList<Field> arr_importField, ArrayList<Field> arr_exportField) throws IOException
 	{
-//		Field field1 = arr_field.get(0);
-		// TODO Auto-generated method stub
+		StringBuilder sb = new StringBuilder();
+		InputStream is = this.getClass().getResourceAsStream("GetDetailById");
+		byte buffer[] = new byte[1024];
+		int len = 0;
+		while ((len = is.read(buffer)) != -1)
+		{
+			sb.append(new String(buffer, 0, len));
+		}
+		String ifEqualsImportTable = ImExIf(arr_importField, true);
+		String ifEqualsExportTable = ImExIf(arr_exportField, false);
+		bw.write(sb.toString().replace("<tableName>", tableName).replace("<table.col0>", arr_field.get(0).name).replace("<ifEqualsImportTable>", ifEqualsImportTable).replace("<ifEqualsExportTable>", ifEqualsExportTable).replace("<className>", getClassName(tableName)).replace("<variableName>", getVariableName(tableName)));
+		bw.newLine();
+	}
+	private String ImExIf(ArrayList<Field> arr, boolean isImport)
+	{
+		String _if = "if(tableName.equals(\"";
+		String ifEqualsImExportTable = "";
+		String getSet = "set";
+		String add = "";
+		String bracket = "";
+		if (!isImport)
+		{
+			getSet = "get";
+			add = ".add";
+			bracket = "()";
+		}
+		for (int i = 0; i < arr.size(); i++)
+		{
+			ifEqualsImExportTable += (i == 0 ? "" : "\t\t\telse ") + _if + arr.get(i).name + "\"))\n\t\t\t{\n\t\t\t\t<variableName>." + getSet + arr.get(i).type + bracket + add + "(new " + arr.get(i).type + "DAO().assemble(rst));\n\t\t\t}" + (i == arr.size() - 1 ? "" : "\n");
+		}
+		return ifEqualsImExportTable;
+	}
+	private void printGetById(ByteArrayOutputStream baos)
+	{
+//		bw.write("\t\tString sql = \"select * from <tableName> where <col0> = ?\"".replace("<tableName>", tableName).replace("<col0>",arr_field.get(0).name)+";");
+//		bw.newLine();
+//		bw.write("\t\tpst.set"+makeStrFirstUpper(arr_field.get(0).type)+"(1,id);");
+//		bw.newLine();
+//		bw.write("\t\trst = pst.executeQuery();");
+//		bw.newLine();
+//		bw.write("\t\tif (rst.next())");
+//		bw.newLine();
+//		bw.write("\t\t{");
+//		bw.newLine();
+//		bw.write("\t\t\t"+currentVariable+" = assemble(rst);");
+//		bw.newLine();
+//		bw.write("\t\t}");
 	}
 	public String buildDBMain() throws IOException
 	{
@@ -632,15 +712,15 @@ public class BuildTool extends DBMain
 			bw.write(columnName + ";");
 			bw.newLine();
 		}
-		for (int i = 0; i < importKeysTableNames.size(); i++)// 打印导入的键
+		for (int i = 0; i < importKeysTableNames.size(); i++)// 打印导入的键成员变量
 		{
 			bw.write("\tprivate " + getClassName(importKeysTableNames.get(i)) + " " + getVariableName(importKeysTableNames.get(i)) + ";");
 			arr_relationship.add(new Field(getClassName(importKeysTableNames.get(i)), getVariableName(importKeysTableNames.get(i))));
 			bw.newLine();
 		}
-		for (int i = 0; i < exportKeysTableNames.size(); i++)// 打印导出的键
+		for (int i = 0; i < exportKeysTableNames.size(); i++)// 打印导出的键成员变量
 		{
-			bw.write("\tprivate ArrayList<" + getClassName(exportKeysTableNames.get(i)) + "> " + getVariableName(exportKeysTableNames.get(i)) + ";");
+			bw.write("\tprivate ArrayList<" + getClassName(exportKeysTableNames.get(i)) + "> " + getVariableName(exportKeysTableNames.get(i)) + " = new ArrayList<" + getClassName(exportKeysTableNames.get(i)) + ">();");
 			arr_relationship.add(new Field("ArrayList<" + getClassName(exportKeysTableNames.get(i)) + ">", getVariableName(exportKeysTableNames.get(i))));
 			bw.newLine();
 		}
@@ -709,26 +789,7 @@ public class BuildTool extends DBMain
 		}
 		// 打印关系的GetSet方法
 		printGetSet(bw, arr_relationship);
-		String methodName = "\tpublic String toString()";// toString
-		bw.write(methodName);
-		bw.newLine();
-		bw.write("\t" + "{");
-		bw.newLine();
-		bw.write("\t\treturn ");
-		for (int i = 0; i < arr_field.size(); i++)
-		{
-			bw.write(arr_field.get(i).name + "+\"\\t\"+");
-		}
-		for (int i = 0; i < arr_relationship.size() - 1; i++)
-		{
-			String variable = arr_relationship.get(i).name;
-			bw.write("(this." + variable + " == null ? \"\" : \"\\t\"+" + variable + ") +");
-		}
-		if (arr_relationship.size() - 1 >= 0)
-			bw.write("(this." + arr_relationship.get(arr_relationship.size() - 1).name + " == null ? \"\" : \"\\t\"+" + arr_relationship.get(arr_relationship.size() - 1).name + ");");
-		bw.newLine();
-		bw.write("\t}");
-		bw.newLine();
+		printToString(tableName, bw, arr_field);
 		bw.write("}");
 		bw.newLine();
 		realese();
@@ -736,6 +797,37 @@ public class BuildTool extends DBMain
 		baos.close();
 		baos.writeTo(System.out);
 		return baos.toString();
+	}
+	private void printToString(String tableName, BufferedWriter bw, ArrayList<Field> arr_field) throws IOException, SQLException
+	{
+		String methodName = "\tpublic String toString()";// toString
+		bw.write(methodName);
+		bw.newLine();
+		bw.write("\t" + "{");
+		bw.newLine();
+		bw.write("\t\treturn ");
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < arr_field.size(); i++)
+		{
+			sb.append(arr_field.get(i).name + " + \"\\t\" + ");
+		}
+		ArrayList<Field> arr_importField = getImportKeysFields(tableName);
+		ArrayList<Field> arr_exportField = getExportKeysFields(tableName);
+		for (int i = 0; i < arr_importField.size(); i++)
+		{
+			String variable = arr_importField.get(i).name;
+			sb.append("(this." + variable + " == null ? \"\" : \"\\t\" + " + variable + ") + ");
+		}
+		for (int i = 0; i < arr_exportField.size(); i++)
+		{
+			String variable = arr_exportField.get(i).name;
+			sb.append("(this." + variable + ".size() == 0? \"\" : \"\\t\" + " + variable + ") + ");
+		}
+		sb.replace(sb.length() - 3, sb.length(), ";");
+		bw.write(sb.toString());
+		bw.newLine();
+		bw.write("\t}");
+		bw.newLine();
 	}
 	private void printImportAll(String packageName, BufferedWriter bw, ArrayList<String> importKeysTableNames, ArrayList<String> exportKeysTableNames) throws IOException
 	{
@@ -759,7 +851,7 @@ public class BuildTool extends DBMain
 		{
 			for (int i = 0; i < tableNames.size(); i++)
 			{
-				bw.write("import " + DirectoryManager.getPackageNameByTableName(packageName, tableNames.get(i)) + "." + getClassName(tableNames.get(i)) + ";");
+				bw.write("import " + DirectoryManager.getPackageNameByTableName(packageName, tableNames.get(i)) + ".*;");
 				bw.newLine();
 			}
 			if (tableNames.size() != 0)
@@ -772,6 +864,7 @@ public class BuildTool extends DBMain
 		{
 			String type = arr.get(i).type;
 			String variable = arr.get(i).name;
+			System.out.println("type:" + type);
 			String makeVariableFirstUpper = makeStrFirstUpper(variable);
 			String get = "get";
 			// set

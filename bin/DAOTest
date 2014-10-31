@@ -23,6 +23,8 @@ public class <class>DAOTest {
 			System.out.println("modifyTest:");
 			//<class> <lower_class> = new <class>(<constructor>);
 			//modifyTest(<lower_class>);
+			System.out.println("getDetailByIdTest:");
+			//getDetailByIdTest(1);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
@@ -31,16 +33,16 @@ public class <class>DAOTest {
 	}
 
 	private static void getAllTest() throws ClassNotFoundException, SQLException {
-		ArrayList<<class>> <class> = <lower_class>DAO.getAll();
-		for (<class> <lower_class> : <class>) {
+		ArrayList<<class>> <lower_class>s = <lower_class>DAO.getAll();
+		for (<class> <lower_class> : <lower_class>s) {
 			System.out.print(<lower_class> + "\t");
 			System.out.println();
 		}
 	}
 
 	private static void getbyIdTest(int id) throws ClassNotFoundException, SQLException {
-		<class> <class> = <lower_class>DAO.getById(id);
-		System.out.println(<class>);
+		<class> <lower_class> = <lower_class>DAO.getById(id);
+		System.out.println(<lower_class>);
 	}
 
 	private static void addTest() throws ClassNotFoundException, SQLException {
@@ -56,5 +58,9 @@ public class <class>DAOTest {
 	private static void modifyTest(<class> <lower_class>) throws ClassNotFoundException, SQLException {
 		<lower_class>DAO.modify(<lower_class>);
 	}
-
+	
+	private static void getDetailByIdTest(int id) throws ClassNotFoundException, SQLException {
+		<class> <lower_class> = <lower_class>DAO.getDetailById(id);
+		System.out.println(<lower_class>);
+	}
 }
