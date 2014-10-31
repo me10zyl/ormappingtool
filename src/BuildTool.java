@@ -584,11 +584,11 @@ public class BuildTool extends DBMain
 			str = str.replace("<package>", "package " + DirectoryManager.getPackageNameDBMain(packageName) + ";");
 		else
 			str = str.replace("<package>", "");
-		if (dataBaseSoft.equals(BuildTool.DATABASE_SQLSERVER))
+		if (BuildTool.DATABASE_SQLSERVER.equals(dataBaseSoft))
 		{
 			str = str.replace("<driver>", "com.microsoft.sqlserver.jdbc.SQLServerDriver");
 			str = str.replace("<url>", "jdbc:sqlserver://" + host + ":" + port + ";databaseName=" + dataBaseName);
-		} else if (dataBaseSoft.equals(BuildTool.DATABASE_MYSQL))
+		} else if (BuildTool.DATABASE_MYSQL.equals(dataBaseSoft))
 		{
 			str = str.replace("<driver>", "com.mysql.jdbc.Driver");
 			str = str.replace("<url>", "jdbc:sqlserver://" + host + ":" + port + "/" + dataBaseName);
@@ -657,7 +657,11 @@ public class BuildTool extends DBMain
 			} else if (arr_field.get(i).type.equals("boolean"))
 			{
 				var = "true";
-			} else
+			} else if(arr_field.get(i).type.equals("float"))
+			{
+				var = "1.0f";
+			}
+			else
 			{
 				var = "\"" + arr_field.get(i).name + "\"";
 			}
@@ -955,9 +959,9 @@ public class BuildTool extends DBMain
 	private void forName() throws ClassNotFoundException
 	{
 		String driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-		if (dataBaseSoft.equals(BuildTool.DATABASE_SQLSERVER))
+		if (BuildTool.DATABASE_SQLSERVER.equals(dataBaseSoft))
 		{
-		} else if (dataBaseSoft.equals(BuildTool.DATABASE_MYSQL))
+		} else if (BuildTool.DATABASE_MYSQL.equals(dataBaseSoft))
 		{
 			driver = "com.mysql.jdbc.Driver";
 		}
@@ -966,11 +970,11 @@ public class BuildTool extends DBMain
 	private Connection getConnection() throws SQLException
 	{
 		String url = "jdbc:sqlserver://" + host + ":" + port + ";databaseName=" + dataBaseName;
-		if (dataBaseSoft.equals(BuildTool.DATABASE_SQLSERVER))
+		if (BuildTool.DATABASE_SQLSERVER.equals(dataBaseSoft))
 		{
-		} else if (dataBaseSoft.equals(BuildTool.DATABASE_MYSQL))
+		} else if (BuildTool.DATABASE_MYSQL.equals(dataBaseSoft))
 		{
-			url = "jdbc:sqlserver://" + host + ":" + port + "/" + dataBaseName;
+			url = "jdbc:mysql://" + host + ":" + port + "/" + dataBaseName;
 		}
 		return DriverManager.getConnection(url, username, password);
 	}

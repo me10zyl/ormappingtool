@@ -397,15 +397,6 @@ public class UIMain extends javax.swing.JFrame
 				e.consume();
 			}
 		});
-		try
-		{
-			String dbmain = tool.buildDBMain();
-			jTextArea1.setText(dbmain);
-		} catch (IOException e1)
-		{
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 		this.addWindowListener(new WindowAdapter()
 		{
 			@Override
@@ -461,6 +452,15 @@ public class UIMain extends javax.swing.JFrame
 				UIFile u = new UIFile(UIMain.this, jf_address.getText(), jf_port.getText(), jf_dbname.getText(), jf_username.getText(), jf_password.getText(), jf_tablename.getText(), (String)jcb_dataBase.getSelectedItem());
 			}
 		});
+		try
+		{
+			String dbmain = tool.buildDBMain();
+			jTextArea1.setText(dbmain);
+		} catch (IOException e1)
+		{
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	}// </editor-fold>
 		// GEN-END:initComponents
 	private void jb_copyActionPerformed(java.awt.event.ActionEvent evt)

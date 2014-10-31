@@ -103,7 +103,6 @@ public class UIFile extends javax.swing.JDialog
 								{
 									try
 									{
-										System.out.println("dataBaseSoft:" + dataBaseSoft);
 										final BuildTool tool = new BuildTool(host, port, dataBaseName, username, password, dataBaseSoft);
 										ArrayList<String> tables = tool.getTables();
 										generateDBMain(tool, DirectoryManager.getDBMainPathName());
