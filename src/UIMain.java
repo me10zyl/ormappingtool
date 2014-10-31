@@ -217,7 +217,14 @@ public class UIMain extends javax.swing.JFrame
 			{
 				public void actionPerformed(java.awt.event.ActionEvent evt)
 				{
-					jb_getActionPerformed(evt);
+					try
+					{
+						jb_getActionPerformed(evt);
+					} catch (IOException e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				}
 			});
 		}
@@ -464,12 +471,13 @@ public class UIMain extends javax.swing.JFrame
 		StringSelection stringSelection = new StringSelection(areas[jTabbedPane1.getSelectedIndex()].getText());
 		Toolkit.getDefaultToolkit().getSystemClipboard().setContents(stringSelection, null);
 	}
-	private void jb_getActionPerformed(java.awt.event.ActionEvent evt)
+	private void jb_getActionPerformed(java.awt.event.ActionEvent evt) throws IOException
 	{
 		// TODO add your handling code here:
 		final BuildTool tool = new BuildTool(jf_address.getText(), jf_port.getText(), jf_dbname.getText(), jf_username.getText(), jf_password.getText(), (String)jcb_dataBase.getSelectedItem());
 		try
 		{
+			refreshDBMain(tool);
 			refreshjComboBox1(tool);
 			refreshjComboBox2(tool);
 		} catch (SQLException e)
@@ -482,6 +490,11 @@ public class UIMain extends javax.swing.JFrame
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	private void refreshDBMain(BuildTool tool2) throws IOException
+	{
+		// TODO Auto-generated method stub
+		jTextArea1.setText(tool.buildDBMain());
 	}
 	private void refreshjComboBox2(final BuildTool tool) throws SQLException, ClassNotFoundException
 	{

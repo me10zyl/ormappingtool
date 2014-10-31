@@ -1,9 +1,7 @@
-import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.awt.event.WindowStateListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,7 +19,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 
 public class UIFile extends javax.swing.JDialog
 {
@@ -37,9 +34,12 @@ public class UIFile extends javax.swing.JDialog
 	private String password;
 	private String tableName;
 	private String dataBaseSoft;
+
 	/**
 	 * Auto-generated main method to display this JDialog
-	 * @param dataBaseSoft TODO
+	 * 
+	 * @param dataBaseSoft
+	 *                TODO
 	 */
 	public UIFile(JFrame frame, String host, String port, String dataBaseName, String username, String password, String tableName, String dataBaseSoft)
 	{
@@ -103,7 +103,7 @@ public class UIFile extends javax.swing.JDialog
 								{
 									try
 									{
-										System.out.println("dataBaseSoft:"+dataBaseSoft);
+										System.out.println("dataBaseSoft:" + dataBaseSoft);
 										final BuildTool tool = new BuildTool(host, port, dataBaseName, username, password, dataBaseSoft);
 										ArrayList<String> tables = tool.getTables();
 										generateDBMain(tool, DirectoryManager.getDBMainPathName());
@@ -120,7 +120,7 @@ public class UIFile extends javax.swing.JDialog
 										// catch
 										// block
 										e.printStackTrace();
-										JOptionPane.showMessageDialog(null, e.getMessage());
+										JOptionPane.showMessageDialog(UIFile.this, e.getMessage());
 									} catch (SQLException e)
 									{
 										// TODO
@@ -128,7 +128,7 @@ public class UIFile extends javax.swing.JDialog
 										// catch
 										// block
 										e.printStackTrace();
-										JOptionPane.showMessageDialog(null, e.getMessage());
+										JOptionPane.showMessageDialog(UIFile.this, e.getMessage());
 									} catch (IOException e)
 									{
 										// TODO
@@ -136,7 +136,7 @@ public class UIFile extends javax.swing.JDialog
 										// catch
 										// block
 										e.printStackTrace();
-										JOptionPane.showMessageDialog(null, e.getMessage());
+										JOptionPane.showMessageDialog(UIFile.this, e.getMessage());
 									}
 								}
 							}
@@ -175,7 +175,7 @@ public class UIFile extends javax.swing.JDialog
 										// catch
 										// block
 										e.printStackTrace();
-										JOptionPane.showMessageDialog(null, e.getMessage());
+										JOptionPane.showMessageDialog(UIFile.this, e.getMessage());
 									} catch (SQLException e)
 									{
 										// TODO
@@ -183,6 +183,7 @@ public class UIFile extends javax.swing.JDialog
 										// catch
 										// block
 										e.printStackTrace();
+										JOptionPane.showMessageDialog(UIFile.this, e.getMessage());
 										JOptionPane.showMessageDialog(null, e.getMessage());
 									} catch (IOException e)
 									{
@@ -191,7 +192,7 @@ public class UIFile extends javax.swing.JDialog
 										// catch
 										// block
 										e.printStackTrace();
-										JOptionPane.showMessageDialog(null, e.getMessage());
+										JOptionPane.showMessageDialog(UIFile.this, e.getMessage());
 									}
 								}
 							}
@@ -206,6 +207,7 @@ public class UIFile extends javax.swing.JDialog
 		} catch (Exception e)
 		{
 			e.printStackTrace();
+			JOptionPane.showMessageDialog(UIFile.this, e.getMessage());
 		}
 		this.addWindowListener(new WindowListener()
 		{
@@ -224,10 +226,12 @@ public class UIFile extends javax.swing.JDialog
 				{
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
+					JOptionPane.showMessageDialog(UIFile.this, e1.getMessage());
 				} catch (IOException e1)
 				{
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
+					JOptionPane.showMessageDialog(UIFile.this, e1.getMessage());
 				} finally
 				{
 					try
@@ -239,6 +243,7 @@ public class UIFile extends javax.swing.JDialog
 						// TODO Auto-generated catch
 						// block
 						e1.printStackTrace();
+						JOptionPane.showMessageDialog(UIFile.this, e1.getMessage());
 					}
 				}
 			}
@@ -319,6 +324,7 @@ public class UIFile extends javax.swing.JDialog
 		{
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+			JOptionPane.showMessageDialog(UIFile.this, e1.getMessage());
 		} finally
 		{
 			if (pw != null)
