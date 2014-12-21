@@ -428,21 +428,21 @@ public class UIMain extends javax.swing.JFrame
 			public void windowOpened(WindowEvent e)
 			{
 				// TODO Auto-generated method stub
-				try
-				{
-					arr_model1 = tool.getTables();
-					arr_model2 = tool.getDatabases();
-					jComboBox2.setModel(new jComboboxModel(arr_model2));
-					jComboBox1.setModel(new jComboboxModel(arr_model1));
-				} catch (SQLException e1)
-				{
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (ClassNotFoundException e1)
-				{
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+//				try
+//				{
+//					arr_model1 = tool.getTables();
+//					arr_model2 = tool.getDatabases();
+//					jComboBox2.setModel(new jComboboxModel(arr_model2));
+//					jComboBox1.setModel(new jComboboxModel(arr_model1));
+//				} catch (SQLException e1)
+//				{
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				} catch (ClassNotFoundException e1)
+//				{
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
 			}
 		});
 		jb_file.addActionListener(new ActionListener()

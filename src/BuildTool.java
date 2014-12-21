@@ -591,7 +591,7 @@ public class BuildTool extends DBMain
 		} else if (BuildTool.DATABASE_MYSQL.equals(dataBaseSoft))
 		{
 			str = str.replace("<driver>", "com.mysql.jdbc.Driver");
-			str = str.replace("<url>", "jdbc:sqlserver://" + host + ":" + port + "/" + dataBaseName);
+			str = str.replace("<url>", "jdbc:mysql://" + host + ":" + port + "/" + dataBaseName);
 		}
 		str = str.replace("<user>", username);
 		str = str.replace("<password>", password);

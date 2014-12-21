@@ -5,6 +5,6 @@
 	<classpathentry kind="lib" path="X:/Java/Jdbc jar/sqljdbc4.jar"/>
 	<classpathentry kind="lib" path="lib/swing-layout-1.0.3.jar"/>
 	<classpathentry kind="lib" path="lib/AbsoluteLayout.jar"/>
-	<classpathentry kind="lib" path="X:/Java/Jdbc jar/mysql-connector-java-5.0.8.jar"/>
+	<classpathentry kind="lib" path="F:/MySQL/Connector J 5.1.27/mysql-connector-java-5.1.27-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
