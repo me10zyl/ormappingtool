@@ -345,7 +345,7 @@ public class BuildTool extends DBMain
 		bw.newLine();
 		bw.write("\t{");
 		bw.newLine();
-		bw.write("\t\tString sql = \"delete from users where " + arr_field.get(0).name + "=?\";");
+		bw.write("\t\tString sql = \"delete from " + tableName + " where " + arr_field.get(0).name + "=?\";");
 		bw.newLine();
 		bw.write("\t\tpst = this.getPreparedStatement(sql);");
 		bw.newLine();
@@ -657,11 +657,10 @@ public class BuildTool extends DBMain
 			} else if (arr_field.get(i).type.equals("boolean"))
 			{
 				var = "true";
-			} else if(arr_field.get(i).type.equals("float"))
+			} else if (arr_field.get(i).type.equals("float"))
 			{
 				var = "1.0f";
-			}
-			else
+			} else
 			{
 				var = "\"" + arr_field.get(i).name + "\"";
 			}
