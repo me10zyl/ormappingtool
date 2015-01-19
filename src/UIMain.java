@@ -36,6 +36,10 @@ import javax.swing.LayoutStyle;
 import javax.swing.SwingUtilities;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.ListDataListener;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 
 /*
  * UIMain.java
@@ -112,6 +116,12 @@ public class UIMain extends javax.swing.JFrame
 		jLabel3 = new javax.swing.JLabel();
 		jLabel4 = new javax.swing.JLabel();
 		jf_address = new javax.swing.JTextField();
+		jf_address.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent e) {
+//				jf_dbname.setText("");
+			};
+		});
 		jf_port = new javax.swing.JTextField();
 		jLabel6 = new javax.swing.JLabel();
 		jf_dbname = new javax.swing.JTextField();
@@ -134,13 +144,38 @@ public class UIMain extends javax.swing.JFrame
 		jf_password.setColumns(7);
 		jf_password.setText("sa");
 		javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+		jPanel1Layout.setHorizontalGroup(
+			jPanel1Layout.createParallelGroup(Alignment.LEADING)
+				.addGroup(jPanel1Layout.createSequentialGroup()
+					.addGroup(jPanel1Layout.createParallelGroup(Alignment.LEADING)
+						.addGroup(jPanel1Layout.createSequentialGroup()
+							.addComponent(jLabel1)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(jf_username, GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE))
+						.addGroup(jPanel1Layout.createSequentialGroup()
+							.addContainerGap()
+							.addComponent(jLabel2)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addComponent(jf_password, GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)))
+					.addContainerGap())
+		);
+		jPanel1Layout.setVerticalGroup(
+			jPanel1Layout.createParallelGroup(Alignment.LEADING)
+				.addGroup(jPanel1Layout.createSequentialGroup()
+					.addGroup(jPanel1Layout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(jLabel1)
+						.addComponent(jf_username, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(jPanel1Layout.createParallelGroup(Alignment.TRAILING)
+						.addComponent(jLabel2)
+						.addComponent(jf_password))
+					.addGap(0))
+		);
 		jPanel1.setLayout(jPanel1Layout);
 		{
 			jb_file = new JButton();
 			jb_file.setText("\u8f93\u51fa\u81f3\u6587\u4ef6...");
 		}
-		jPanel1Layout.setHorizontalGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(jPanel1Layout.createSequentialGroup().addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(jPanel1Layout.createSequentialGroup().addComponent(jLabel1).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(jf_username, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)).addGroup(jPanel1Layout.createSequentialGroup().addComponent(jLabel2).addGap(18, 18, 18).addComponent(jf_password, javax.swing.GroupLayout.DEFAULT_SIZE, 146, Short.MAX_VALUE))).addContainerGap()));
-		jPanel1Layout.setVerticalGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(jPanel1Layout.createSequentialGroup().addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jLabel1).addComponent(jf_username, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)).addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED).addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jLabel2).addComponent(jf_password, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)).addContainerGap(8, Short.MAX_VALUE)));
 		jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEtchedBorder(), "\u6570\u636e\u5e93\u5730\u5740"));
 		jLabel3.setText("\u5730\u5740");
 		jLabel4.setText("\u7aef\u53e3");
@@ -155,6 +190,7 @@ public class UIMain extends javax.swing.JFrame
 			private void jf_addressActionPerformed(ActionEvent evt)
 			{
 				// TODO Auto-generated method stub
+				jf_dbname.setText("");
 			}
 		});
 		jf_port.setColumns(5);
@@ -259,50 +295,59 @@ public class UIMain extends javax.swing.JFrame
 			}
 		});
 		javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+		jPanel4Layout.setHorizontalGroup(
+			jPanel4Layout.createParallelGroup(Alignment.LEADING)
+				.addGroup(jPanel4Layout.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(jPanel4Layout.createParallelGroup(Alignment.LEADING)
+						.addGroup(jPanel4Layout.createSequentialGroup()
+							.addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, 258, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.UNRELATED)
+							.addGroup(jPanel4Layout.createParallelGroup(Alignment.LEADING)
+								.addGroup(jPanel4Layout.createSequentialGroup()
+									.addComponent(jb_copy, GroupLayout.PREFERRED_SIZE, 91, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(jb_get, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(jb_file, GroupLayout.DEFAULT_SIZE, 98, Short.MAX_VALUE))
+								.addComponent(jButton1, 0, 287, Short.MAX_VALUE)))
+						.addGroup(jPanel4Layout.createSequentialGroup()
+							.addComponent(jPanel3, GroupLayout.PREFERRED_SIZE, 367, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(jPanel1, 0, 184, Short.MAX_VALUE))))
+		);
+		jPanel4Layout.setVerticalGroup(
+			jPanel4Layout.createParallelGroup(Alignment.LEADING)
+				.addGroup(jPanel4Layout.createSequentialGroup()
+					.addGroup(jPanel4Layout.createParallelGroup(Alignment.LEADING)
+						.addComponent(jPanel3, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(jPanel4Layout.createParallelGroup(Alignment.TRAILING)
+						.addGroup(jPanel4Layout.createSequentialGroup()
+							.addComponent(jButton1)
+							.addGroup(jPanel4Layout.createParallelGroup(Alignment.LEADING)
+								.addGroup(jPanel4Layout.createSequentialGroup()
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addGroup(jPanel4Layout.createParallelGroup(Alignment.BASELINE)
+										.addComponent(jb_copy, GroupLayout.DEFAULT_SIZE, 41, Short.MAX_VALUE)
+										.addComponent(jb_get, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+								.addGroup(jPanel4Layout.createSequentialGroup()
+									.addGap(12)
+									.addComponent(jb_file, GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)))
+							.addPreferredGap(ComponentPlacement.RELATED))
+						.addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE))
+					.addGap(0))
+		);
 		jPanel4.setLayout(jPanel4Layout);
-		jPanel4Layout.setVerticalGroup(jPanel4Layout.createSequentialGroup()
-			.addGroup(jPanel4Layout.createParallelGroup()
-			    .addGroup(GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
-			        .addComponent(jPanel3, GroupLayout.PREFERRED_SIZE, 82, GroupLayout.PREFERRED_SIZE)
-			        .addGap(6))
-			    .addComponent(jPanel1, GroupLayout.Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 88, GroupLayout.PREFERRED_SIZE))
-			.addGroup(jPanel4Layout.createParallelGroup()
-			    .addGroup(GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
-			        .addComponent(jButton1, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE)
-			        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-			        .addGroup(jPanel4Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-			            .addComponent(jb_copy, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-			            .addComponent(jb_get, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE)
-			            .addComponent(jb_file, GroupLayout.Alignment.BASELINE, GroupLayout.PREFERRED_SIZE, 38, GroupLayout.PREFERRED_SIZE)))
-			    .addGroup(GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
-			        .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, 70, GroupLayout.PREFERRED_SIZE)
-			        .addGap(0, 13, Short.MAX_VALUE)))
-			.addContainerGap());
-		jPanel4Layout.setHorizontalGroup(jPanel4Layout.createSequentialGroup()
-			.addContainerGap()
-			.addGroup(jPanel4Layout.createParallelGroup()
-			    .addGroup(GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
-			        .addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, 258, GroupLayout.PREFERRED_SIZE)
-			        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-			        .addGroup(jPanel4Layout.createParallelGroup()
-			            .addGroup(GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
-			                .addComponent(jb_copy, GroupLayout.PREFERRED_SIZE, 91, GroupLayout.PREFERRED_SIZE)
-			                .addComponent(jb_get, GroupLayout.PREFERRED_SIZE, 86, GroupLayout.PREFERRED_SIZE)
-			                .addComponent(jb_file, 0, 104, Short.MAX_VALUE)
-			                .addGap(6))
-			            .addComponent(jButton1, GroupLayout.Alignment.LEADING, 0, 287, Short.MAX_VALUE)))
-			    .addGroup(GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
-			        .addComponent(jPanel3, GroupLayout.PREFERRED_SIZE, 367, GroupLayout.PREFERRED_SIZE)
-			        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-			        .addComponent(jPanel1, 0, 184, Short.MAX_VALUE))));
 		layout.setVerticalGroup(layout.createSequentialGroup().addComponent(jPanel4, GroupLayout.PREFERRED_SIZE, 177, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addComponent(jTabbedPane1, GroupLayout.PREFERRED_SIZE, 375, GroupLayout.PREFERRED_SIZE).addComponent(jb_about, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE));
 		layout.setHorizontalGroup(layout.createParallelGroup().addGroup(GroupLayout.Alignment.LEADING, layout.createSequentialGroup().addComponent(jPanel4, GroupLayout.PREFERRED_SIZE, 563, GroupLayout.PREFERRED_SIZE).addContainerGap(11, Short.MAX_VALUE)).addGroup(layout.createSequentialGroup().addGap(19).addGroup(layout.createParallelGroup().addGroup(GroupLayout.Alignment.LEADING, layout.createSequentialGroup().addComponent(jTabbedPane1, GroupLayout.PREFERRED_SIZE, 544, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 0, Short.MAX_VALUE)).addGroup(GroupLayout.Alignment.LEADING, layout.createSequentialGroup().addGap(0, 480, Short.MAX_VALUE).addComponent(jb_about, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE))).addContainerGap()));
 		pack();
-		this.setSize(580, 618);
-		String lnfName = "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
+		this.setSize(580, 620);
+		String lnfName = "javax.swing.plaf.nimbus.NimbusLookAndFeel";
 		try
 		{
-			javax.swing.UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+			javax.swing.UIManager.setLookAndFeel(lnfName);
 			SwingUtilities.updateComponentTreeUI(this);
 		} catch (UnsupportedLookAndFeelException ex1)
 		{
@@ -474,6 +519,7 @@ public class UIMain extends javax.swing.JFrame
 	private void jb_getActionPerformed(java.awt.event.ActionEvent evt) throws IOException
 	{
 		// TODO add your handling code here:
+		jf_dbname.setText("");
 		final BuildTool tool = new BuildTool(jf_address.getText(), jf_port.getText(), jf_dbname.getText(), jf_username.getText(), jf_password.getText(), (String)jcb_dataBase.getSelectedItem());
 		try
 		{
